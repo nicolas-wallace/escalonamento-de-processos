@@ -11,8 +11,8 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 - [x] FCFS (First Come, First Served)
 - [x] SJF (Shortest Job First)
 - [x] SRTF (Shortest Remaining Time First)
-- [ ] Escalonamento por prioridade, sem preempção
-- [ ] Escalonamento por prioridade, com preempção
+- [x] Escalonamento por prioridade, sem preempção
+- [x] Escalonamento por prioridade, com preempção
 - [ ] Round-Robin com quantum, sem prioridade
 - [ ] Round-Robin com prioridade e envelhecimento
 
@@ -83,6 +83,8 @@ Exemplo (`entrada.txt`):
 ```
 
 A entrada não precisa estar ordenada por instante de criação — os processos são numerados (`P1`, `P2`, ...) na ordem em que aparecem no arquivo.
+
+Nos algoritmos por prioridade, valores maiores indicam prioridade maior. Sem preempção, o processo escolhido executa até terminar; com preempção, a escolha é refeita a cada segundo e uma prioridade maior pode interrompê-lo. Empates seguem a regra de desempate descrita acima.
 
 ## Como executar
 

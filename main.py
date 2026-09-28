@@ -25,7 +25,10 @@ def main():
         print("Nenhum processo informado na entrada.")
         return
 
-    for algoritmo in ("fcfs", "sjf", "srtf"):
+    for algoritmo in (
+        "fcfs", "sjf", "srtf",
+        "prioridade_sem_preempcao", "prioridade_com_preempcao",
+    ):
         resultado_processos, linha_do_tempo, trocas = simular(processos, algoritmo)
         imprimir_resultado(algoritmo, resultado_processos, linha_do_tempo, trocas)
 

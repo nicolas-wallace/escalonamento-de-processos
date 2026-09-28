@@ -4,7 +4,7 @@ Cada função recebe a lista de candidatos (processos já chegados e com
 tempo restante > 0) e o pid do processo atualmente em execução, e
 devolve o processo escolhido para ocupar a CPU.
 
-Critério de desempate comum aos três algoritmos, conforme o enunciado:
+Critério de desempate comum aos algoritmos, conforme o enunciado:
   (i)   processo que já está com o processador (evita troca de contexto)
   (ii)  menor tempo restante de processamento
   (iii) escolha arbitrária (usamos o pid, por reprodutibilidade)
@@ -30,9 +30,15 @@ def escolher_srtf(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: p.restante)
 
 
+def escolher_prioridade(candidatos, executando_pid):
+    return _com_desempate(candidatos, executando_pid, lambda p: -p.prioridade)
+
+
 # algoritmo -> (função de escolha, é_preemptivo?)
 ALGORITMOS = {
     "fcfs": (escolher_fcfs, False),
     "sjf": (escolher_sjf, False),
     "srtf": (escolher_srtf, True),
+    "prioridade_sem_preempcao": (escolher_prioridade, False),
+    "prioridade_com_preempcao": (escolher_prioridade, True),
 }
