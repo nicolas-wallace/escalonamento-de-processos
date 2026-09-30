@@ -1,5 +1,4 @@
-"""Interface gráfica (web local): serve a página da pasta web/ e expõe uma API
-que chama o simulador. Toda a lógica de escalonamento continua em simulacao.py."""
+"""Interface web local: serve a pasta web/ e expõe uma API sobre o simulador."""
 
 import argparse
 import json
@@ -24,7 +23,7 @@ MAX_CORPO = 100_000
 
 
 def configuracao_padrao():
-    # lê o mesmo config.txt do main.py; se não existir, usa quantum 2 e aging 1
+    # mesmo config.txt do main.py; sem ele, quantum 2 e aging 1
     try:
         with open(os.path.join(PASTA, "config.txt"), encoding="utf-8") as arquivo:
             quantum, aging = ler_configuracao(arquivo.read().splitlines())
@@ -57,7 +56,7 @@ def montar_processos(lista):
 
 
 def calcular(dados):
-    """Roda os 7 algoritmos e devolve tudo o que a página precisa desenhar."""
+    """Roda os 7 algoritmos e devolve o que a página precisa desenhar."""
     processos = montar_processos(dados.get("processos"))
     quantum = inteiro(dados.get("quantum"), "quantum", 1, 100)
     aging = inteiro(dados.get("aging"), "aging", 0, 100)
@@ -123,7 +122,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def criar_servidor(porta):
-    # só aceita conexões da própria máquina; se a porta estiver ocupada, usa uma livre
+    # só aceita conexões locais; com a porta ocupada, usa uma livre
     try:
         return ThreadingHTTPServer(("127.0.0.1", porta), Handler)
     except OSError:

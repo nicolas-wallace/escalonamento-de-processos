@@ -149,7 +149,6 @@ button { cursor: pointer; }
 .btn-play:hover { filter: brightness(1.06); }
 .btn-play:disabled { opacity: .45; cursor: default; }
 
-.acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
 
 /* tabela de entrada */
 .tabela-entrada { width: 100%; border-collapse: collapse; }
@@ -340,7 +339,7 @@ table { border-collapse: collapse; }
   white-space: nowrap;
   border-bottom: 1px solid var(--linha);
 }
-.tabela-resultados td, .tabela-comparacao td, .tabela-diagrama td {
+.tabela-resultados td, .tabela-comparacao td {
   padding: 7px 10px;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -349,8 +348,7 @@ table { border-collapse: collapse; }
 }
 .tabela-resultados th:first-child, .tabela-resultados td:first-child,
 .tabela-comparacao th:first-child, .tabela-comparacao td:first-child,
-.tabela-diagrama th:first-child, .tabela-diagrama td:first-child { text-align: left; }
-.tabela-resultados tr:last-child td, .tabela-comparacao tr:last-child td, .tabela-diagrama tr:last-child td { border-bottom: 0; }
+.tabela-resultados tr:last-child td, .tabela-comparacao tr:last-child td { border-bottom: 0; }
 
 .tabela-comparacao tbody tr { cursor: pointer; transition: background .12s; }
 .tabela-comparacao tbody tr:hover { background: var(--superficie-2); }

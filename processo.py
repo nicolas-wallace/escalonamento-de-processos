@@ -1,4 +1,4 @@
-"""Modela um processo e seus atributos de controle."""
+"""Processo e seus atributos de controle."""
 
 
 class Processo:

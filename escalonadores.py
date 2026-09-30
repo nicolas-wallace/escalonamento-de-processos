@@ -1,13 +1,9 @@
-"""Funções de escolha de processo para cada algoritmo de escalonamento.
+"""Funções de escolha do processo que ocupa a CPU, uma por algoritmo.
 
-Cada função recebe a lista de candidatos (processos já chegados e com
-tempo restante > 0) e o pid do processo atualmente em execução, e
-devolve o processo escolhido para ocupar a CPU.
-
-Critério de desempate comum aos algoritmos, conforme o enunciado:
-  (i)   processo que já está com o processador (evita troca de contexto)
-  (ii)  menor tempo restante de processamento
-  (iii) escolha arbitrária (usamos o pid, por reprodutibilidade)
+Cada função recebe os candidatos (já chegados e com tempo restante) e o pid
+do processo em execução, e devolve o escolhido. Desempate nos algoritmos
+clássicos, na ordem do enunciado: quem já está na CPU, menor tempo restante
+e, por fim, o pid (escolha determinística).
 """
 
 
@@ -15,32 +11,36 @@ def _com_desempate(candidatos, executando_pid, chave_primaria):
     def chave(p):
         ja_rodando = 0 if p.pid == executando_pid else 1
         return (chave_primaria(p), ja_rodando, p.restante, p.pid)
-    return sorted(candidatos, key=chave)[0]
+    return min(candidatos, key=chave)
 
 
 def escolher_fcfs(candidatos, executando_pid):
+    """Menor instante de chegada."""
     return _com_desempate(candidatos, executando_pid, lambda p: p.chegada)
 
 
 def escolher_sjf(candidatos, executando_pid):
+    """Menor tempo restante (sem preempção, o motor só chama ao liberar a CPU)."""
     return _com_desempate(candidatos, executando_pid, lambda p: p.restante)
 
 
 def escolher_srtf(candidatos, executando_pid):
+    """Menor tempo restante, reavaliado a cada segundo."""
     return _com_desempate(candidatos, executando_pid, lambda p: p.restante)
 
 
 def escolher_prioridade(candidatos, executando_pid):
+    """Maior prioridade."""
     return _com_desempate(candidatos, executando_pid, lambda p: -p.prioridade)
 
 
-# round robin: vence quem está há mais tempo na fila
 def escolher_rr(candidatos, executando_pid, quantum_completo, aging):
+    """Quem está há mais tempo na fila."""
     return min(candidatos, key=lambda p: p.fila)
 
 
-# round robin com envelhecimento: maior prioridade dinâmica, sem repetir quem acabou de executar
 def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
+    """Maior prioridade dinâmica entre os outros processos (quem acabou de rodar não repete)."""
     outros = [p for p in candidatos if p.pid != executando_pid]
     escolhido = min(outros, key=lambda p: (-p.prioridade_dinamica, p.fila))
     # quem esperou ganha +aging, só se o quantum foi completo
@@ -53,7 +53,7 @@ def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
     return escolhido
 
 
-# algoritmo -> (função de escolha, é_preemptivo?)
+# algoritmo -> (função de escolha, é preemptivo?)
 ALGORITMOS = {
     "fcfs": (escolher_fcfs, False),
     "sjf": (escolher_sjf, False),
@@ -64,5 +64,5 @@ ALGORITMOS = {
     "round_robin_prioridade_aging": (escolher_rr_aging, True),
 }
 
-# algoritmos que trocam de processo por fim de quantum
+# algoritmos em que o quantum define a troca de processo
 COM_QUANTUM = ("round_robin", "round_robin_prioridade_aging")

@@ -1,9 +1,10 @@
-"""Leitura e parsing da entrada padrão (stdin)."""
+"""Leitura dos processos e da configuração (quantum e aging)."""
 
 from processo import Processo
 
 
 def ler_processos(linhas):
+    """Cada linha: chegada duração prioridade. Linhas em branco são ignoradas."""
     processos = []
     for i, linha in enumerate(linhas):
         partes = linha.split()
@@ -15,7 +16,7 @@ def ler_processos(linhas):
 
 
 def ler_configuracao(linhas):
-    # lê quantum:N e aging:N (na mesma linha ou em linhas separadas)
+    """Lê quantum:N e aging:N, na mesma linha ou em linhas separadas."""
     config = {}
     for linha in linhas:
         for parte in linha.split():

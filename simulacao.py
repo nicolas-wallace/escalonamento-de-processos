@@ -1,6 +1,4 @@
-"""Motor de simulação: executa um algoritmo sobre uma lista de processos
-e devolve o estado final dos processos, a linha do tempo e o número de
-trocas de contexto."""
+"""Motor da simulação: roda um algoritmo segundo a segundo sobre os processos."""
 
 import copy
 
@@ -8,6 +6,11 @@ from escalonadores import ALGORITMOS, COM_QUANTUM
 
 
 def simular(processos_originais, algoritmo, quantum=2, aging=1):
+    """Devolve (processos finalizados, linha do tempo, trocas de contexto).
+
+    A linha do tempo tem um pid por segundo (None = CPU ociosa). A lista
+    original não é alterada.
+    """
     processos = copy.deepcopy(processos_originais)
     n = len(processos)
     escolher, preemptivo = ALGORITMOS[algoritmo]
@@ -18,6 +21,7 @@ def simular(processos_originais, algoritmo, quantum=2, aging=1):
     fatia = 0  # segundos seguidos do processo atual (conta o quantum)
     linha_do_tempo = []
 
+    # trava de segurança contra laço infinito
     tempo_maximo = sum(p.duracao for p in processos) + \
         (max((p.chegada for p in processos), default=0)) + 10
 
@@ -25,6 +29,7 @@ def simular(processos_originais, algoritmo, quantum=2, aging=1):
         chegaram = [p for p in processos if p.chegada <= tempo and p.restante > 0]
 
         if not chegaram:
+            # CPU ociosa até a próxima chegada
             linha_do_tempo.append(None)
             executando = None
             tempo += 1
@@ -47,8 +52,10 @@ def simular(processos_originais, algoritmo, quantum=2, aging=1):
                 if quantum_completo:
                     fatia = 0
         elif preemptivo:
+            # reavalia a escolha a cada segundo
             escolhido = escolher(chegaram, executando)
         else:
+            # sem preempção: só escolhe quando a CPU fica livre
             proc_atual = next((p for p in processos if p.pid == executando), None)
             if proc_atual is None or proc_atual.restante <= 0:
                 escolhido = escolher(chegaram, executando)
@@ -76,6 +83,7 @@ def simular(processos_originais, algoritmo, quantum=2, aging=1):
 
 
 def _contar_trocas_de_contexto(linha_do_tempo):
+    # mudança de um processo para outro; ociosidade no meio não conta
     trocas = 0
     anterior = None
     for pid in linha_do_tempo:

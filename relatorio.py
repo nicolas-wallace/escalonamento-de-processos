@@ -2,6 +2,7 @@
 
 
 def imprimir_resultado(algoritmo, processos, linha_do_tempo, trocas):
+    """Tabela por processo, médias, trocas de contexto e diagrama."""
     n = len(processos)
     tts = [p.turnaround for p in processos]
     tws = [p.espera for p in processos]
@@ -19,6 +20,7 @@ def imprimir_resultado(algoritmo, processos, linha_do_tempo, trocas):
 
 
 def imprimir_diagrama(processos, linha_do_tempo):
+    """Uma linha por segundo: ## executando, -- esperando, vazio = fora do sistema."""
     pids = [p.pid for p in processos]
     cabecalho = f"{'tempo':8}" + "".join(f"{pid:5}" for pid in pids)
     print("\n" + cabecalho)
