@@ -323,9 +323,7 @@
       el("span", { class: "num", text: fmt(valor) })));
     const corpo = linhas.map(({ a, r }) => {
       const sub = a.params ? a.params.map((k) => `${k} ${S[k]}`).join(" · ") : a.tipo;
-      const tr = el("tr", { class: a.nome === S.algoritmo ? "atual" : "", tabindex: "0",
-        onclick: () => selecionar(a.nome),
-        onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); selecionar(a.nome); } } },
+      const tr = el("tr", { class: a.nome === S.algoritmo ? "atual" : "" },
         el("td", {}, el("span", { class: "nome", text: a.nome }), el("span", { class: "sub", text: sub })),
         celula(r.tt_medio, maxTT),
         celula(r.tw_medio, maxTW),

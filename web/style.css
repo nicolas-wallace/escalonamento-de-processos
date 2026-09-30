@@ -351,8 +351,6 @@ table { border-collapse: collapse; }
 .tabela-comparacao th:first-child, .tabela-comparacao td:first-child { text-align: left; }
 .tabela-resultados tr:last-child td, .tabela-comparacao tr:last-child td { border-bottom: 0; }
 
-.tabela-comparacao tbody tr { cursor: pointer; transition: background .12s; }
-.tabela-comparacao tbody tr:hover { background: var(--superficie-2); }
 .tabela-comparacao tr.atual { background: var(--destaque-suave); }
 .tabela-comparacao .nome { font-weight: 600; }
 .tabela-comparacao .sub { display: block; font-size: 0.72rem; font-weight: 400; color: var(--tinta-3); }
