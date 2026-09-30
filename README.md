@@ -13,8 +13,8 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 - [x] SRTF (Shortest Remaining Time First)
 - [x] Escalonamento por prioridade, sem preempção
 - [x] Escalonamento por prioridade, com preempção
-- [ ] Round-Robin com quantum, sem prioridade
-- [ ] Round-Robin com prioridade e envelhecimento
+- [x] Round-Robin com quantum, sem prioridade
+- [x] Round-Robin com prioridade e envelhecimento
 
 ## Estrutura do projeto
 
@@ -22,6 +22,7 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 .
 ├── main.py            # Ponto de entrada do programa
 ├── entrada.py          # Leitura e parsing da entrada (arquivo ou stdin)
+├── config.txt          # Valores de quantum e aging
 ├── processo.py         # Classe Processo (estrutura de controle)
 ├── escalonadores.py     # Funções de escolha de processo para cada algoritmo
 ├── simulacao.py         # Motor da simulação (loop principal de execução)
@@ -61,6 +62,24 @@ Em caso de empate na escolha do processo a ocupar a CPU, é aplicada a seguinte 
 1. Processo que já está com o processador (evita troca de contexto desnecessária);
 2. Processo com menor tempo restante de execução;
 3. Escolha determinística pelo `pid` (usado como substituto de uma escolha aleatória, garantindo reprodutibilidade dos testes).
+
+## Round-Robin
+
+O `quantum` e a taxa de envelhecimento (`aging`) são lidos do arquivo `config.txt`, que fica ao lado do `main.py`:
+
+```
+quantum:2
+aging:1
+```
+
+**Sem prioridade:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora.
+
+**Com prioridade e envelhecimento:** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
+
+Convenções adotadas (o enunciado não define):
+- Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na fila antes.
+- Chegadas simultâneas entram na fila pela ordem da entrada.
+- Empate de prioridade dinâmica: vence quem está há mais tempo na fila.
 
 ## Trocas de contexto
 
@@ -108,6 +127,12 @@ Get-Content entrada.txt | python main.py
 python main.py
 ```
 Digite as linhas dos processos e finalize com `Ctrl+D` (Linux/macOS) ou `Ctrl+Z` + Enter (Windows).
+
+## Testes
+
+```bash
+python -m unittest
+```
 
 ## Saída
 
