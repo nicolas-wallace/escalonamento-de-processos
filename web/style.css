@@ -287,7 +287,7 @@ button { cursor: pointer; }
 .g-espera { fill: none; stroke: var(--tinta-3); stroke-width: 1.2; stroke-dasharray: 4 3; }
 .g-ocioso { fill: var(--ocioso); }
 .g-ocioso-txt { fill: var(--tinta-3); font-size: 10px; font-family: var(--sans); }
-.g-barra-txt { font-size: 11px; font-weight: 600; font-family: var(--sans); pointer-events: none; }
+.g-barra-txt { font-size: 11px; font-weight: 600; font-family: var(--sans); pointer-events: none; fill: #0F1420; }
 .g-cursor { stroke: var(--destaque); stroke-width: 2; }
 .g-cursor-ponta { fill: var(--destaque); }
 
@@ -315,6 +315,7 @@ button { cursor: pointer; }
 .estado .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .estado .titulo { min-width: 118px; font-size: 0.76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--tinta-3); }
 .pilula {
+  color: #0F1420;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -347,7 +348,7 @@ table { border-collapse: collapse; }
   white-space: nowrap;
 }
 .tabela-resultados th:first-child, .tabela-resultados td:first-child,
-.tabela-comparacao th:first-child, .tabela-comparacao td:first-child,
+.tabela-comparacao th:first-child, .tabela-comparacao td:first-child { text-align: left; }
 .tabela-resultados tr:last-child td, .tabela-comparacao tr:last-child td { border-bottom: 0; }
 
 .tabela-comparacao tbody tr { cursor: pointer; transition: background .12s; }
@@ -373,6 +374,3 @@ table { border-collapse: collapse; }
   .estado .titulo { min-width: 100%; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
-}

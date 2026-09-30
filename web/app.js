@@ -2,34 +2,31 @@
   "use strict";
 
   const ALGORITMOS = [
-    { id: "fcfs", nome: "FCFS", tipo: "cooperativo" },
-    { id: "sjf", nome: "SJF", tipo: "cooperativo" },
-    { id: "srtf", nome: "SRTF", tipo: "preemptivo" },
-    { id: "prioc", nome: "PRIOc", tipo: "cooperativo" },
-    { id: "priop", nome: "PRIOp", tipo: "preemptivo" },
-    { id: "rr", nome: "RR", tipo: "preemptivo", params: ["quantum"] },
-    { id: "rr_aging", nome: "RR (aging)", tipo: "preemptivo", params: ["quantum", "aging"] },
+    { nome: "FCFS", tipo: "cooperativo" },
+    { nome: "SJF", tipo: "cooperativo" },
+    { nome: "SRTF", tipo: "preemptivo" },
+    { nome: "PRIOc", tipo: "cooperativo" },
+    { nome: "PRIOp", tipo: "preemptivo" },
+    { nome: "RR", tipo: "preemptivo", params: ["quantum"] },
+    { nome: "RR (aging)", tipo: "preemptivo", params: ["quantum", "aging"] },
   ];
 
   const CORES = ["#4F7CE8", "#E8A33D", "#8E6BD9", "#3FB68B", "#E0607E", "#3AA7C9",
                  "#D9793A", "#7C8A99", "#C45FB0", "#8FA63E", "#5B7FA6", "#A0785A"];
   const EXEMPLO = [[0, 5, 2], [0, 2, 3], [1, 4, 1], [3, 3, 4]];
-  const LIMITE = 12;
   const NS = "http://www.w3.org/2000/svg";
 
   const S = {
     processos: [],
     quantum: "2",
     aging: "1",
-    algoritmo: "rr",
+    algoritmo: "RR",
     resultados: null,
     t: 0,
     tocando: false,
     timer: null,
     velocidade: 1,
     aba: "gantt",
-    sequencia: 0,
-    espera: null,
   };
 
   const $ = (sel) => document.querySelector(sel);
@@ -55,20 +52,6 @@
 
   const fmt = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const cor = (i) => CORES[i % CORES.length];
-
-  function luminancia(hex) {
-    const n = parseInt(hex.slice(1), 16);
-    const [r, g, b] = [16, 8, 0].map((s) => {
-      const c = ((n >> s) & 255) / 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  }
-
-  function corTexto(hex) {
-    const L = luminancia(hex);
-    return 1.05 / (L + 0.05) > (L + 0.05) / 0.067 ? "#FFFFFF" : "#1B2233";
-  }
 
   const atual = () => S.resultados[S.algoritmo];
   const total = () => atual().linha.length;
@@ -124,7 +107,7 @@
         type: "number", inputmode: "numeric", step: "1", min: "0",
         value: p[nome], "data-i": String(i), "data-campo": nome,
         "aria-label": `${nome} de P${i + 1}`,
-        oninput: (ev) => { S.processos[i][nome] = ev.target.value; agendar(); },
+        oninput: (ev) => { S.processos[i][nome] = ev.target.value; atualizar(); },
       });
       return el("tr", {},
         el("td", {}, el("span", { class: "amostra", style: `background:${cor(i)}` }), `P${i + 1}`),
@@ -136,7 +119,6 @@
           onclick: () => { S.processos.splice(i, 1); renderTabela(); atualizar(); },
         }, "×")));
     }));
-    $("#btn-add").disabled = S.processos.length >= LIMITE;
   }
 
   function carregar(lista) {
@@ -157,23 +139,16 @@
       novos.push([p[0], p[1], p[2]]);
     }
     if (!novos.length) { mostrarAviso("O arquivo não tem processos."); return; }
-    if (novos.length > LIMITE) { mostrarAviso(`O arquivo tem mais de ${LIMITE} processos.`); return; }
     carregar(novos);
   }
 
   // ---------- comunicação com o simulador ----------
-
-  function agendar() {
-    clearTimeout(S.espera);
-    S.espera = setTimeout(atualizar, 140);
-  }
 
   async function atualizar() {
     const v = validar();
     mostrarAviso(v.erro);
     $(".coluna-dir").classList.toggle("desatualizado", Boolean(v.erro));
     if (v.erro) return;
-    const minha = ++S.sequencia;
     try {
       const resp = await fetch("/api/simular", {
         method: "POST",
@@ -182,7 +157,6 @@
       });
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.erro || "erro desconhecido");
-      if (minha !== S.sequencia) return;
       S.resultados = json.resultados;
       parar();
       S.t = total();
@@ -196,17 +170,17 @@
 
   function renderAlgoritmos() {
     $("#algoritmos").replaceChildren(...ALGORITMOS.map((a) => el("button", {
-      class: "chip", type: "button", "aria-pressed": String(a.id === S.algoritmo),
-      onclick: () => selecionar(a.id),
+      class: "chip", type: "button", "aria-pressed": String(a.nome === S.algoritmo),
+      onclick: () => selecionar(a.nome),
     }, a.nome)));
-    const a = ALGORITMOS.find((x) => x.id === S.algoritmo);
+    const a = ALGORITMOS.find((x) => x.nome === S.algoritmo);
     const usa = a.params || [];
     $("#campo-quantum").classList.toggle("inativo", !usa.includes("quantum"));
     $("#campo-aging").classList.toggle("inativo", !usa.includes("aging"));
   }
 
-  function selecionar(id) {
-    S.algoritmo = id;
+  function selecionar(nome) {
+    S.algoritmo = nome;
     parar();
     if (S.resultados) { S.t = total(); renderTudo(); } else renderAlgoritmos();
   }
@@ -278,7 +252,7 @@
       const i = indiceDe(f.pid), c = cor(i);
       g.append(sv("rect", { x: x(f.ini), y: yCpu, width: w, height: 28, rx: 4, style: `fill:${c}` },
         sv("title", {}, document.createTextNode(`${f.pid} na CPU de ${f.ini} a ${f.fim}`))));
-      if (w >= 26) g.append(sv("text", { class: "g-barra-txt", x: x(f.ini) + w / 2, y: yCpu + 14, "text-anchor": "middle", "dominant-baseline": "central", style: `fill:${corTexto(c)}` }, document.createTextNode(f.pid)));
+      if (w >= 26) g.append(sv("text", { class: "g-barra-txt", x: x(f.ini) + w / 2, y: yCpu + 14, "text-anchor": "middle", "dominant-baseline": "central" }, document.createTextNode(f.pid)));
     }
 
     g.append(sv("line", { class: "g-eixo", x1: x(0), y1: yEixo, x2: x(T), y2: yEixo }));
@@ -297,7 +271,7 @@
 
   function pilula(pid, detalhe) {
     const i = indiceDe(pid), c = cor(i);
-    const p = el("span", { class: "pilula", style: `background:${c};color:${corTexto(c)}` }, pid);
+    const p = el("span", { class: "pilula", style: `background:${c}` }, pid);
     if (detalhe) p.append(el("small", { text: detalhe }));
     return p;
   }
@@ -340,7 +314,7 @@
   }
 
   function renderComparacao() {
-    const linhas = ALGORITMOS.map((a) => ({ a, r: S.resultados[a.id] }));
+    const linhas = ALGORITMOS.map((a) => ({ a, r: S.resultados[a.nome] }));
     const maxTT = Math.max(...linhas.map((l) => l.r.tt_medio));
     const maxTW = Math.max(...linhas.map((l) => l.r.tw_medio), 1e-9);
     const maxTR = Math.max(...linhas.map((l) => l.r.tr_medio), 1e-9);
@@ -349,9 +323,9 @@
       el("span", { class: "num", text: fmt(valor) })));
     const corpo = linhas.map(({ a, r }) => {
       const sub = a.params ? a.params.map((k) => `${k} ${S[k]}`).join(" · ") : a.tipo;
-      const tr = el("tr", { class: a.id === S.algoritmo ? "atual" : "", tabindex: "0",
-        onclick: () => selecionar(a.id),
-        onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); selecionar(a.id); } } },
+      const tr = el("tr", { class: a.nome === S.algoritmo ? "atual" : "", tabindex: "0",
+        onclick: () => selecionar(a.nome),
+        onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); selecionar(a.nome); } } },
         el("td", {}, el("span", { class: "nome", text: a.nome }), el("span", { class: "sub", text: sub })),
         celula(r.tt_medio, maxTT),
         celula(r.tw_medio, maxTW),
@@ -423,7 +397,6 @@
   // ---------- eventos ----------
 
   $("#btn-add").addEventListener("click", () => {
-    if (S.processos.length >= LIMITE) return;
     S.processos.push({ chegada: "0", duracao: "1", prioridade: "0" });
     renderTabela();
     atualizar();
@@ -438,8 +411,8 @@
     ev.target.value = "";
     if (arquivo) lerArquivo(arquivo);
   });
-  $("#quantum").addEventListener("input", (ev) => { S.quantum = ev.target.value; agendar(); });
-  $("#aging").addEventListener("input", (ev) => { S.aging = ev.target.value; agendar(); });
+  $("#quantum").addEventListener("input", (ev) => { S.quantum = ev.target.value; atualizar(); });
+  $("#aging").addEventListener("input", (ev) => { S.aging = ev.target.value; atualizar(); });
 
   $("#btn-play").addEventListener("click", () => { if (S.resultados) alternarPlay(); });
   $("#btn-voltar").addEventListener("click", () => { parar(); passo(-1); });
@@ -456,11 +429,9 @@
   // ---------- início ----------
 
   async function iniciar() {
-    try {
-      const config = await (await fetch("/api/config")).json();
-      S.quantum = String(config.quantum);
-      S.aging = String(config.aging);
-    } catch { /* usa os valores padrão */ }
+    const config = await (await fetch("/api/config")).json();
+    S.quantum = String(config.quantum);
+    S.aging = String(config.aging);
     $("#quantum").value = S.quantum;
     $("#aging").value = S.aging;
     renderAlgoritmos();

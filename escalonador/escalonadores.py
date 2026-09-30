@@ -46,25 +46,14 @@ def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
 
 # algoritmo -> (função de escolha, é preemptivo?)
 ALGORITMOS = {
-    "fcfs": (escolher_fcfs, False),
-    "sjf": (escolher_sjf, False),
-    "srtf": (escolher_srtf, True),
-    "prioc": (escolher_prioridade, False),
-    "priop": (escolher_prioridade, True),
-    "rr": (escolher_rr, True),
-    "rr_aging": (escolher_rr_aging, True),
-}
-
-# nome exibido de cada algoritmo
-NOMES = {
-    "fcfs": "FCFS",
-    "sjf": "SJF",
-    "srtf": "SRTF",
-    "prioc": "PRIOc",
-    "priop": "PRIOp",
-    "rr": "RR",
-    "rr_aging": "RR (aging)",
+    "FCFS": (escolher_fcfs, False),
+    "SJF": (escolher_sjf, False),
+    "SRTF": (escolher_srtf, True),
+    "PRIOc": (escolher_prioridade, False),
+    "PRIOp": (escolher_prioridade, True),
+    "RR": (escolher_rr, True),
+    "RR (aging)": (escolher_rr_aging, True),
 }
 
 # algoritmos em que o quantum define a troca de processo
-COM_QUANTUM = ("rr", "rr_aging")
+COM_QUANTUM = ("RR", "RR (aging)")

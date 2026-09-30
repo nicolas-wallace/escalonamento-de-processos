@@ -1,13 +1,10 @@
-from .escalonadores import NOMES
-
-
 def imprimir_resultado(algoritmo, processos, linha_do_tempo, trocas):
     n = len(processos)
     tts = [p.turnaround for p in processos]
     tws = [p.espera for p in processos]
     trs = [p.resposta for p in processos]
 
-    print(f"\n===== Algoritmo: {NOMES[algoritmo]} =====")
+    print(f"\n===== Algoritmo: {algoritmo} =====")
     print(f"{'Processo':10}{'Chegada':10}{'Duração':10}{'Início':10}{'Término':10}{'TT':6}{'TW':6}{'TR':6}")
     for p, tt, tw, tr in zip(processos, tts, tws, trs):
         print(f"{p.pid:10}{p.chegada:<10}{p.duracao:<10}{p.inicio:<10}{p.termino:<10}{tt:<6}{tw:<6}{tr:<6}")

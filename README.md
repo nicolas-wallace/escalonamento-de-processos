@@ -83,7 +83,7 @@ Além da saída no terminal, há uma interface no navegador. Ela usa o mesmo sim
 python interface.py
 ```
 
-Abre `http://127.0.0.1:8000/` (opções: `--porta N`, `--sem-navegador`). Só a biblioteca padrão é usada e o servidor aceita apenas conexões da própria máquina.
+Abre `http://127.0.0.1:8000/` no navegador (Ctrl+C no terminal encerra).
 
 Na página é possível:
 - editar os processos (chegada, duração, prioridade) ou carregar um `.txt` no mesmo formato do `entrada.txt`;
