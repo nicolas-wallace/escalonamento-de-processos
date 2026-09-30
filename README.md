@@ -26,7 +26,9 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 ├── processo.py         # Classe Processo (estrutura de controle)
 ├── escalonadores.py     # Funções de escolha de processo para cada algoritmo
 ├── simulacao.py         # Motor da simulação (loop principal de execução)
-└── relatorio.py         # Formatação da saída (tabela de métricas + diagrama)
+├── relatorio.py         # Formatação da saída (tabela de métricas + diagrama)
+├── interface.py         # Interface web local (opcional)
+└── web/                 # Página da interface (HTML, CSS, JS)
 ```
 
 ### `processo.py`
@@ -127,6 +129,24 @@ Get-Content entrada.txt | python main.py
 python main.py
 ```
 Digite as linhas dos processos e finalize com `Ctrl+D` (Linux/macOS) ou `Ctrl+Z` + Enter (Windows).
+
+## Interface gráfica (web)
+
+Além da saída no terminal, há uma interface no navegador. Ela usa o mesmo simulador (`simulacao.py`); só a apresentação é nova.
+
+```bash
+python interface.py
+```
+
+Abre `http://127.0.0.1:8000/` (opções: `--porta N`, `--sem-navegador`). Só a biblioteca padrão é usada e o servidor aceita apenas conexões da própria máquina.
+
+Na página é possível:
+- editar os processos (chegada, duração, prioridade) ou carregar um `.txt` no mesmo formato do `entrada.txt`;
+- escolher o algoritmo e ajustar quantum e aging (valores iniciais vêm do `config.txt`);
+- ver turnaround médio, espera média, trocas de contexto e tempo total;
+- ver o gráfico de Gantt, com execução passo a passo, o diagrama vertical (copiável como texto) e uma comparação dos 7 algoritmos.
+
+Arquivos: `interface.py` (servidor e API) e a pasta `web/` (`index.html`, `style.css`, `app.js`).
 
 ## Testes
 
