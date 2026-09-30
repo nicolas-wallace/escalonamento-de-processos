@@ -1,4 +1,5 @@
 def imprimir_resultado(algoritmo, processos, linha_do_tempo, trocas):
+    # TT = término - chegada, TW = TT - duração, TR = início - chegada
     n = len(processos)
     tts = [p.turnaround for p in processos]
     tws = [p.espera for p in processos]

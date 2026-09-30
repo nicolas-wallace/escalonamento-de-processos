@@ -8,7 +8,7 @@ from escalonador.simulacao import simular
 
 
 def obter_linhas():
-    # arquivo passado como argumento ou, sem argumento, entrada padrão
+    # entrada padrão (stdin), como pede o enunciado; também aceita um arquivo como argumento
     if len(sys.argv) > 1:
         caminho = sys.argv[1]
         with open(caminho, encoding="utf-8") as arquivo:
@@ -24,6 +24,7 @@ def obter_configuracao():
 
 
 def main():
+    # lê a entrada, roda os 7 algoritmos e imprime o resultado de cada um
     linhas = obter_linhas()
     processos = ler_processos(linhas)
     quantum, aging = obter_configuracao()
@@ -33,6 +34,7 @@ def main():
         return
 
     for algoritmo in ALGORITMOS:
+        # cada algoritmo parte dos mesmos processos originais
         resultado_processos, linha_do_tempo, trocas = simular(
             processos, algoritmo, quantum, aging)
         imprimir_resultado(algoritmo, resultado_processos, linha_do_tempo, trocas)

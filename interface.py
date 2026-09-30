@@ -10,6 +10,7 @@ from escalonador.simulacao import simular
 
 PASTA = os.path.dirname(os.path.abspath(__file__))
 PORTA = 8000
+# arquivos da pasta web/ que o servidor entrega ao navegador
 ARQUIVOS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/style.css": ("style.css", "text/css; charset=utf-8"),
@@ -17,6 +18,7 @@ ARQUIVOS = {
 }
 
 
+# valida os números vindos da página
 def inteiro(valor, nome, minimo):
     if not isinstance(valor, int) or valor < minimo:
         raise ValueError(f"{nome} deve ser um inteiro maior ou igual a {minimo}")
@@ -56,7 +58,9 @@ def calcular(dados):
     return {"resultados": resultados}
 
 
+# GET entrega a página e o config.txt; POST /api/simular roda os algoritmos
 class Handler(BaseHTTPRequestHandler):
+    # resposta HTTP com o conteúdo já pronto
     def enviar(self, status, tipo, corpo):
         self.send_response(status)
         self.send_header("Content-Type", tipo)
@@ -67,6 +71,7 @@ class Handler(BaseHTTPRequestHandler):
     def enviar_json(self, status, dados):
         self.enviar(status, "application/json; charset=utf-8", json.dumps(dados).encode("utf-8"))
 
+    # páginas e quantum/aging iniciais
     def do_GET(self):
         if self.path == "/api/config":
             with open(os.path.join(PASTA, "config.txt"), encoding="utf-8") as arquivo:
@@ -78,6 +83,7 @@ class Handler(BaseHTTPRequestHandler):
         with open(os.path.join(PASTA, "web", nome), "rb") as arquivo:
             self.enviar(200, tipo, arquivo.read())
 
+    # recebe os processos da página, simula e devolve os resultados (erro 400 se inválidos)
     def do_POST(self):
         if self.path != "/api/simular":
             return self.enviar_json(404, {"erro": "não encontrado"})
@@ -89,6 +95,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    # servidor só acessível da própria máquina; abre a página no navegador
     servidor = HTTPServer(("127.0.0.1", PORTA), Handler)
     url = f"http://127.0.0.1:{PORTA}/"
     print(f"Interface em {url}  (Ctrl+C para encerrar)")

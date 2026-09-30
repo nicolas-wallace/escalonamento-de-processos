@@ -1,10 +1,8 @@
 # Simulador de Escalonamento de Processos
 
-Simulador de algoritmos de escalonamento de CPU, desenvolvido para a disciplina de **Sistemas Operacionais**
+Simulador de algoritmos de escalonamento de CPU, desenvolvido para a disciplina de **Sistemas Operacionais**.
 
-## Objetivo
-
-Simular o escalonamento de um conjunto de processos usando os algoritmos clássicos de escalonamento de processador, exibindo métricas de desempenho (tempo médio de vida, de espera e de resposta, número de trocas de contexto) e o diagrama de execução ao longo do tempo.
+Dado um conjunto de processos, simula cada algoritmo segundo a segundo e mostra turnaround médio, espera média, resposta média, número de trocas de contexto e o diagrama de execução.
 
 ## Algoritmos implementados
 
@@ -18,30 +16,31 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 
 ## Como executar
 
-**Passando o arquivo como argumento:**
-```bash
-python main.py entrada.txt
-```
+Os processos são lidos da entrada padrão (stdin):
 
-**Via redirecionamento (Linux/macOS ou `cmd.exe` no Windows):**
 ```bash
 python main.py < entrada.txt
 ```
 
-**Via redirecionamento no PowerShell:**
+No PowerShell:
 ```powershell
 Get-Content entrada.txt | python main.py
 ```
 
-## Formato de entrada
-
-Cada linha representa um processo, com três inteiros separados por espaço:
-
-```
-<instante_de_criação> <duração> <prioridade>
+Também é possível passar o arquivo como argumento:
+```bash
+python main.py entrada.txt
 ```
 
-Exemplo (`entrada.txt`):
+Interface gráfica (abre `http://127.0.0.1:8000/` no navegador; Ctrl+C no terminal encerra):
+```bash
+python interface.py
+```
+
+## Entrada
+
+**Processos.** Cada linha é um processo, com três inteiros separados por um ou mais espaços: instante de criação, duração em segundos e prioridade estática (maior número = maior prioridade). A lista não precisa estar ordenada, e os processos são numerados (`P1`, `P2`, ...) pela ordem em que aparecem. Exemplo (`entrada.txt`):
+
 ```
 0 5 2
 0 2 3
@@ -49,78 +48,40 @@ Exemplo (`entrada.txt`):
 3 3 4
 ```
 
-A entrada não precisa estar ordenada por instante de criação — os processos são numerados (`P1`, `P2`, ...) na ordem em que aparecem no arquivo.
-
-Em PRIOc, PRIOp e RR (aging), valores maiores indicam prioridade maior. Em PRIOc o processo escolhido executa até terminar; em PRIOp, a escolha é refeita a cada segundo e uma prioridade maior pode interrompê-lo. Empates seguem a regra de desempate descrita acima.
-
-## Saída
-
-Para cada algoritmo, o programa imprime:
-
-- Tabela com chegada, duração, início, término, turnaround (TT), tempo de espera (TW) e tempo de resposta (TR) de cada processo;
-- Tempo médio de vida (turnaround médio);
-- Tempo médio de espera;
-- Tempo médio de resposta (primeira execução − chegada);
-- Número de trocas de contexto;
-- Diagrama de tempo de execução, na vertical (uma linha por segundo).
-
-No diagrama:
-- `##` — processo em execução naquele segundo;
-- `--` — processo já chegou e aguarda na fila;
-- *(célula em branco)* — processo ainda não chegou ou já terminou.
-
-## Interface gráfica (web)
-
-Além da saída no terminal, há uma interface no navegador. Ela usa o mesmo simulador (`escalonador/simulacao.py`); só a apresentação é nova.
-
-```bash
-python interface.py
-```
-
-Abre `http://127.0.0.1:8000/` no navegador (Ctrl+C no terminal encerra).
-
-Na página é possível:
-- editar os processos (chegada, duração, prioridade) ou carregar um `.txt` no mesmo formato do `entrada.txt`;
-- escolher o algoritmo e ajustar quantum e aging (valores iniciais vêm do `config.txt`);
-- ver turnaround médio, espera média, resposta média, trocas de contexto e tempo total;
-- ver o gráfico de execução (com modo passo a passo) e a comparação dos 7 algoritmos.
-
-## Regra de desempate
-
-Em caso de empate na escolha do processo a ocupar a CPU, é aplicada a seguinte ordem de critérios (conforme especificado no enunciado):
-
-1. Processo que já está com o processador (evita troca de contexto desnecessária);
-2. Processo com menor tempo restante de execução;
-3. Escolha determinística pelo `pid` (usado como substituto de uma escolha aleatória, garantindo resultados reproduzíveis).
-
-## RR e RR (aging)
-
-O `quantum` e a taxa de envelhecimento (`aging`) são lidos do arquivo `config.txt`, que fica ao lado do `main.py`:
+**Configuração.** `quantum` e `aging` ficam no arquivo `config.txt`, ao lado do `main.py`:
 
 ```
 quantum:2
 aging:1
 ```
 
-**RR:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora.
+## Saída
 
-**RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
+Para cada algoritmo, o programa imprime:
 
-Convenções adotadas:
-- Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na fila antes.
-- Chegadas simultâneas entram na fila pela ordem da entrada.
-- Empate de prioridade dinâmica: vence quem está há mais tempo na fila.
+- tabela por processo com chegada, duração, início, término, TT (turnaround: término − chegada), TW (espera: TT − duração) e TR (resposta: início − chegada);
+- tempo médio de vida (turnaround), de espera e de resposta;
+- número de trocas de contexto;
+- diagrama de tempo na vertical, uma linha por segundo: `##` executando, `--` esperando na fila e vazio quando o processo ainda não chegou ou já terminou.
 
-## Trocas de contexto
+## Interface gráfica
 
-Uma troca de contexto é contabilizada sempre que a CPU passa a executar um processo diferente do anterior. Transições envolvendo tempo ocioso (CPU livre) não são contadas, pois não há contexto de outro processo a ser salvo/restaurado.
+Além do terminal, há uma interface no navegador que usa o mesmo simulador (`escalonador/simulacao.py`). Nela é possível:
 
-## Estrutura do projeto
+- editar os processos, carregar um `.txt` no mesmo formato ou usar a entrada do enunciado;
+- escolher o algoritmo e ajustar quantum e aging (valores iniciais vindos do `config.txt`);
+- ver as métricas, o gráfico de execução com modo passo a passo e a comparação dos 7 algoritmos.
+
+`interface.py` é um servidor local (só biblioteca padrão, acessível apenas da própria máquina) que entrega a página da pasta `web/` e simula quando a página pede.
+
+## Decisões de implementação
+
+### Estrutura do projeto
 
 ```
 .
 ├── main.py                # Ponto de entrada (terminal)
-├── interface.py           # Servidor da interface web (opcional)
+├── interface.py           # Servidor da interface web
 ├── config.txt             # Quantum e aging
 ├── entrada.txt            # Exemplo de entrada
 ├── escalonador/           # Núcleo da simulação
@@ -132,31 +93,64 @@ Uma troca de contexto é contabilizada sempre que a CPU passa a executar um proc
 └── web/                   # Página da interface (index.html, style.css, app.js)
 ```
 
-### `escalonador/processo.py`
-Define a classe `Processo`, com os atributos de controle de cada processo:
+### Classe `Processo` (`escalonador/processo.py`)
 
-| Atributo     | Descrição                                              |
-|--------------|---------------------------------------------------------|
-| `pid`        | Identificador do processo (`P1`, `P2`, ...)              |
-| `chegada`    | Instante de criação                                      |
-| `duracao`    | Duração total de execução (em segundos)                  |
-| `prioridade` | Prioridade estática do processo                          |
-| `restante`   | Tempo restante de execução (usado durante a simulação)   |
-| `inicio`     | Instante em que o processo ocupou a CPU pela primeira vez|
-| `termino`    | Instante em que o processo terminou                       |
+Cada processo é um objeto `Processo` que guarda as informações de controle:
 
-Também expõe as propriedades `turnaround` (término − chegada), `espera` (turnaround − duração) e `resposta` (início − chegada).
+| Atributo             | Descrição                                                                 |
+|----------------------|---------------------------------------------------------------------------|
+| `pid`                | Identificador (`P1`, `P2`, ...)                                           |
+| `status`             | `novo` (ainda não chegou), `pronto`, `executando` ou `terminado`          |
+| `chegada`            | Instante de criação                                                       |
+| `duracao`            | Tempo total de CPU necessário                                             |
+| `prioridade`         | Prioridade estática                                                       |
+| `restante`           | Tempo que ainda falta executar                                            |
+| `inicio`             | Primeiro instante em que ocupou a CPU                                     |
+| `termino`            | Instante em que terminou                                                  |
+| `prioridade_dinamica`| Prioridade que cresce com o envelhecimento (só RR com aging)              |
+| `fila`               | Posição na fila de prontos do RR: `(instante em que entrou, 0 = chegada ou 1 = perdeu a CPU)` |
 
-### `escalonador/escalonadores.py`
-Contém uma função de escolha para cada algoritmo, todas seguindo a mesma assinatura: recebem a lista de processos já chegados (candidatos) e o pid do processo em execução, e devolvem o processo escolhido para ocupar a CPU.
+As propriedades `turnaround` (término − chegada), `espera` (turnaround − duração) e `resposta` (início − chegada) são calculadas a partir desses atributos.
 
-O dicionário `ALGORITMOS` mapeia o nome do algoritmo para `(função_de_escolha, é_preemptivo)`, o que permite adicionar novos algoritmos sem alterar o motor de simulação.
+### Estruturas de dados
 
-### `escalonador/simulacao.py`
-Executa a simulação segundo a segundo: a cada instante, identifica os processos já chegados e com tempo restante, aplica a função de escolha do algoritmo, executa o processo escolhido por 1 segundo e atualiza seu estado. Ao final, conta o número de trocas de contexto.
+- **Lista de `Processo`**, na ordem da entrada. Cada algoritmo trabalha sobre uma cópia (`copy.deepcopy`), então todos partem dos mesmos dados.
+- **`linha_do_tempo`**: lista com o `pid` que ocupou a CPU em cada segundo (`None` = CPU ociosa). O diagrama e a contagem de trocas de contexto saem dela.
+- **`ALGORITMOS`**: dicionário `nome → (função de escolha, é preemptivo?)`.
+- **`COM_QUANTUM`**: tupla com os algoritmos em que o quantum define a troca (RR e RR (aging)).
 
-### `escalonador/relatorio.py`
-Imprime a tabela de métricas por processo (chegada, duração, início, término, TT, TW, TR), as médias de turnaround, espera e resposta, o número de trocas de contexto e o diagrama de tempo vertical.
+### Padrão de projeto
+
+Usamos uma forma simples do padrão **Strategy**: há um único motor (`simular`) e cada algoritmo é uma função de escolha intercambiável em `escalonador/escalonadores.py`. Todas recebem os candidatos (processos prontos) e o `pid` em execução, e devolvem quem ocupa a CPU. Para criar um algoritmo novo basta escrever a função e registrá-la em `ALGORITMOS`.
+
+### Motor da simulação (`escalonador/simulacao.py`)
+
+A cada segundo, o motor:
+
+1. marca como `pronto` quem já chegou e ainda não terminou;
+2. escolhe quem executa, conforme o tipo do algoritmo:
+   - **cooperativo** (FCFS, SJF, PRIOc): só escolhe quando a CPU fica livre;
+   - **preemptivo** (SRTF, PRIOp): refaz a escolha a cada segundo;
+   - **com quantum** (RR, RR (aging)): só troca quando o processo termina ou o quantum acaba com outro esperando;
+3. executa o escolhido por 1 segundo (`status = executando`), registra na `linha_do_tempo` e, se acabou, marca `terminado`.
+
+No fim, conta as trocas de contexto: uma troca é cada vez que a CPU passa a executar um processo diferente do anterior. Tempo ocioso entre dois processos não conta.
+
+### Regra de desempate
+
+Como no enunciado, quando há empate na escolha de quem ocupa a CPU, vale esta ordem:
+
+1. o processo que já está com o processador (evita troca de contexto);
+2. o de menor tempo restante;
+3. escolha arbitrária: usamos o `pid`, para o resultado ser sempre o mesmo.
+
+Por exemplo, no exemplo do enunciado, P1 e P2 chegam em 0; nenhum está na CPU, então vence P2, que tem menor tempo restante. Isso vale para todos os algoritmos, inclusive RR e RR (aging).
+
+### RR e RR (aging)
+
+**RR:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora. A fila é por ordem de entrada. Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na frente. Se dois entram no mesmo instante (por exemplo, chegadas simultâneas), vale a regra de desempate: menor tempo restante e, depois, o `pid`.
+
+**RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba, e não há preempção por prioridade. Vence a maior prioridade dinâmica entre os outros processos: quem acabou de usar o quantum não repete no quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento ocorre a cada quantum completo: se o processo anterior terminou antes do fim do quantum, ninguém envelhece. Empate de prioridade dinâmica segue a regra de desempate acima.
 
 ## Requisitos
 
