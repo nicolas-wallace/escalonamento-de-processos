@@ -10,6 +10,8 @@ class Processo:
         self.restante = duracao      # tempo restante de execução
         self.inicio = None           # primeira vez que ocupou a CPU
         self.termino = None          # instante em que terminou
+        self.prioridade_dinamica = prioridade   # muda com o envelhecimento
+        self.fila = (chegada, 0)                # posição na fila de prontos (round robin)
 
     @property
     def turnaround(self):
