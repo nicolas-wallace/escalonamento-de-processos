@@ -92,11 +92,17 @@
     let erro = "";
     S.processos.forEach((p, i) => {
       const c = inteiro(p.chegada), d = inteiro(p.duracao), pr = inteiro(p.prioridade);
-      const ruim = { chegada: c === null || c < 0, duracao: d === null || d < 1, prioridade: pr === null || pr < 0 };
+      const vazio = (campo) => String(p[campo]).trim() === "";
+      const ruim = {
+        chegada: !vazio("chegada") && (c === null || c < 0),
+        duracao: !vazio("duracao") && (d === null || d < 1),
+        prioridade: !vazio("prioridade") && (pr === null || pr < 0),
+      };
       for (const campo of Object.keys(ruim)) marcar(`#tabela-processos input[data-i="${i}"][data-campo="${campo}"]`, ruim[campo]);
       if (!erro && ruim.chegada) erro = `P${i + 1}: a chegada deve ser um inteiro maior ou igual a 0.`;
       if (!erro && ruim.duracao) erro = `P${i + 1}: a duração deve ser um inteiro maior ou igual a 1.`;
       if (!erro && ruim.prioridade) erro = `P${i + 1}: a prioridade deve ser um inteiro maior ou igual a 0.`;
+      if (!erro && (vazio("chegada") || vazio("duracao") || vazio("prioridade"))) erro = `Preencha chegada, duração e prioridade de P${i + 1}.`;
       dados.processos.push({ chegada: c, duracao: d, prioridade: pr });
     });
     const q = inteiro(S.quantum), a = inteiro(S.aging);
@@ -418,9 +424,11 @@
 
   $("#btn-add").addEventListener("click", () => {
     if (S.processos.length >= LIMITE) return;
-    S.processos.push({ chegada: "0", duracao: "3", prioridade: "1" });
+    S.processos.push({ chegada: "", duracao: "", prioridade: "" });
     renderTabela();
     atualizar();
+    const novo = document.querySelector(`#tabela-processos input[data-i="${S.processos.length - 1}"]`);
+    if (novo) novo.focus();
   });
   $("#btn-exemplo").addEventListener("click", () => carregar(EXEMPLO));
   $("#btn-limpar").addEventListener("click", () => { S.processos = []; renderTabela(); atualizar(); });
