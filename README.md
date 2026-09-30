@@ -106,10 +106,10 @@ aging:1
 
 **RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
 
-Convenções adotadas:
+Empates seguem a regra de desempate acima:
+- RR: a ordem é a de entrada na fila; se dois processos entram no mesmo instante (por exemplo, chegadas simultâneas), vence o de menor tempo restante e, depois, o `pid`.
+- RR (aging): se dois processos têm a mesma prioridade dinâmica, vence o de menor tempo restante e, depois, o `pid`.
 - Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na fila antes.
-- Chegadas simultâneas entram na fila pela ordem da entrada.
-- Empate de prioridade dinâmica: vence quem está há mais tempo na fila.
 
 ## Trocas de contexto
 

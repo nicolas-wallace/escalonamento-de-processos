@@ -26,14 +26,15 @@ def escolher_prioridade(candidatos, executando_pid):
 
 
 def escolher_rr(candidatos, executando_pid, quantum_completo, aging):
-    # vence quem está há mais tempo na fila
-    return min(candidatos, key=lambda p: p.fila)
+    # vence quem entrou antes na fila; empate: menor tempo restante, pid
+    return min(candidatos, key=lambda p: (p.fila, p.restante, p.pid))
 
 
 def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
-    # maior prioridade dinâmica, sem repetir quem acabou de executar
+    # maior prioridade dinâmica, sem repetir quem acabou de executar;
+    # empate: menor tempo restante, pid
     outros = [p for p in candidatos if p.pid != executando_pid]
-    escolhido = min(outros, key=lambda p: (-p.prioridade_dinamica, p.fila))
+    escolhido = min(outros, key=lambda p: (-p.prioridade_dinamica, p.restante, p.pid))
     # quem esperou ganha +aging, só se o quantum foi completo
     if quantum_completo:
         for p in candidatos:
