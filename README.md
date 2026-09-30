@@ -32,7 +32,7 @@ Também é possível passar o arquivo como argumento:
 python main.py entrada.txt
 ```
 
-Interface gráfica (abre `http://127.0.0.1:8000/` no navegador; Ctrl+C no terminal encerra):
+Interface gráfica (abre `http://127.0.0.1:8000/` no navegador):
 ```bash
 python interface.py
 ```
