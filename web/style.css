@@ -103,8 +103,10 @@ button { cursor: pointer; }
 .btn:hover { border-color: var(--destaque); color: var(--destaque); }
 .btn:disabled { opacity: .45; cursor: default; }
 .btn:disabled:hover { border-color: var(--linha); color: var(--tinta-2); }
-.btn-limpar { margin-left: auto; background: transparent; border-color: transparent; color: var(--tinta-3); }
-.btn-limpar:hover { border-color: var(--erro); color: var(--erro); }
+.acoes-entrada { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.acoes-entrada .btn-limpar { grid-column: 1 / -1; }
+.btn-limpar { background: rgba(242, 122, 116, .1); border-color: rgba(242, 122, 116, .4); color: var(--erro); }
+.btn-limpar:hover { background: rgba(242, 122, 116, .18); border-color: var(--erro); color: var(--erro); }
 
 .btn-adicionar {
   width: 100%;
