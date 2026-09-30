@@ -5,10 +5,10 @@
     { id: "fcfs", nome: "FCFS", tipo: "cooperativo" },
     { id: "sjf", nome: "SJF", tipo: "cooperativo" },
     { id: "srtf", nome: "SRTF", tipo: "preemptivo" },
-    { id: "prioridade_sem_preempcao", nome: "PRIOc", tipo: "cooperativo" },
-    { id: "prioridade_com_preempcao", nome: "PRIOp", tipo: "preemptivo" },
-    { id: "round_robin", nome: "RR", tipo: "preemptivo", params: ["quantum"] },
-    { id: "round_robin_prioridade_aging", nome: "RR (aging)", tipo: "preemptivo", params: ["quantum", "aging"] },
+    { id: "prioc", nome: "PRIOc", tipo: "cooperativo" },
+    { id: "priop", nome: "PRIOp", tipo: "preemptivo" },
+    { id: "rr", nome: "RR", tipo: "preemptivo", params: ["quantum"] },
+    { id: "rr_aging", nome: "RR (aging)", tipo: "preemptivo", params: ["quantum", "aging"] },
   ];
 
   const CORES = ["#4F7CE8", "#E8A33D", "#8E6BD9", "#3FB68B", "#E0607E", "#3AA7C9",
@@ -21,7 +21,7 @@
     processos: [],
     quantum: "2",
     aging: "1",
-    algoritmo: "round_robin",
+    algoritmo: "rr",
     resultados: null,
     t: 0,
     tocando: false,

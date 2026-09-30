@@ -24,8 +24,8 @@ class CalcularTests(unittest.TestCase):
         resultados = calcular(dados())["resultados"]
         self.assertEqual(len(resultados), 7)
 
-    def test_round_robin_do_enunciado(self):
-        rr = calcular(dados())["resultados"]["round_robin"]
+    def test_rr_do_enunciado(self):
+        rr = calcular(dados())["resultados"]["rr"]
         self.assertEqual(rr["tt_medio"], 9.75)
         self.assertEqual(rr["tw_medio"], 6.25)
         self.assertEqual(rr["trocas"], 7)
@@ -80,7 +80,7 @@ class ServidorTests(unittest.TestCase):
     def test_simular(self):
         status, corpo = self.pedir("/api/simular", dados())
         self.assertEqual(status, 200)
-        self.assertIn("round_robin", json.loads(corpo)["resultados"])
+        self.assertIn("rr", json.loads(corpo)["resultados"])
 
     def test_simular_invalido(self):
         status, corpo = self.pedir("/api/simular", dados(quantum=0))

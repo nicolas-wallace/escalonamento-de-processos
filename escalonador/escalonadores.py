@@ -49,11 +49,22 @@ ALGORITMOS = {
     "fcfs": (escolher_fcfs, False),
     "sjf": (escolher_sjf, False),
     "srtf": (escolher_srtf, True),
-    "prioridade_sem_preempcao": (escolher_prioridade, False),
-    "prioridade_com_preempcao": (escolher_prioridade, True),
-    "round_robin": (escolher_rr, True),
-    "round_robin_prioridade_aging": (escolher_rr_aging, True),
+    "prioc": (escolher_prioridade, False),
+    "priop": (escolher_prioridade, True),
+    "rr": (escolher_rr, True),
+    "rr_aging": (escolher_rr_aging, True),
+}
+
+# nome exibido de cada algoritmo
+NOMES = {
+    "fcfs": "FCFS",
+    "sjf": "SJF",
+    "srtf": "SRTF",
+    "prioc": "PRIOc",
+    "priop": "PRIOp",
+    "rr": "RR",
+    "rr_aging": "RR (aging)",
 }
 
 # algoritmos em que o quantum define a troca de processo
-COM_QUANTUM = ("round_robin", "round_robin_prioridade_aging")
+COM_QUANTUM = ("rr", "rr_aging")

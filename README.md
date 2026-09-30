@@ -8,13 +8,13 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 
 ## Algoritmos implementados
 
-- [x] FCFS (First Come, First Served)
-- [x] SJF (Shortest Job First)
-- [x] SRTF (Shortest Remaining Time First)
-- [x] Escalonamento por prioridade, sem preempção
-- [x] Escalonamento por prioridade, com preempção
-- [x] Round-Robin com quantum, sem prioridade
-- [x] Round-Robin com prioridade e envelhecimento
+- [x] FCFS — First Come, First Served
+- [x] SJF — Shortest Job First
+- [x] SRTF — Shortest Remaining Time First
+- [x] PRIOc — prioridade cooperativa (sem preempção)
+- [x] PRIOp — prioridade com preempção
+- [x] RR — Round-Robin com quantum, sem prioridade
+- [x] RR (aging) — Round-Robin com prioridade e envelhecimento
 
 ## Como executar
 
@@ -57,7 +57,7 @@ Exemplo (`entrada.txt`):
 
 A entrada não precisa estar ordenada por instante de criação — os processos são numerados (`P1`, `P2`, ...) na ordem em que aparecem no arquivo.
 
-Nos algoritmos por prioridade, valores maiores indicam prioridade maior. Sem preempção, o processo escolhido executa até terminar; com preempção, a escolha é refeita a cada segundo e uma prioridade maior pode interrompê-lo. Empates seguem a regra de desempate descrita acima.
+Em PRIOc, PRIOp e RR (aging), valores maiores indicam prioridade maior. Em PRIOc o processo escolhido executa até terminar; em PRIOp, a escolha é refeita a cada segundo e uma prioridade maior pode interrompê-lo. Empates seguem a regra de desempate descrita acima.
 
 ## Saída
 
@@ -99,7 +99,7 @@ Em caso de empate na escolha do processo a ocupar a CPU, é aplicada a seguinte 
 2. Processo com menor tempo restante de execução;
 3. Escolha determinística pelo `pid` (usado como substituto de uma escolha aleatória, garantindo reprodutibilidade dos testes).
 
-## Round-Robin
+## RR e RR (aging)
 
 O `quantum` e a taxa de envelhecimento (`aging`) são lidos do arquivo `config.txt`, que fica ao lado do `main.py`:
 
@@ -108,9 +108,9 @@ quantum:2
 aging:1
 ```
 
-**Sem prioridade:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora.
+**RR:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora.
 
-**Com prioridade e envelhecimento:** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
+**RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
 
 Convenções adotadas (o enunciado não define):
 - Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na fila antes.
@@ -171,7 +171,7 @@ Imprime a tabela de métricas por processo (chegada, duração, início, términ
 python -m unittest
 ```
 
-Um algoritmo específico: `python -m unittest tests.test_round_robin`.
+Um algoritmo específico: `python -m unittest tests.test_rr`.
 
 ## Requisitos
 
