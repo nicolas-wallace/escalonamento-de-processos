@@ -10,9 +10,6 @@
   <div class="pagina">
     <header class="topo">
       <h1>Simulador de Escalonamento</h1>
-      <button id="tema" class="btn-icone" type="button" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
     </header>
 
     <main class="grade">
@@ -25,12 +22,12 @@
             </thead>
             <tbody id="tabela-processos"></tbody>
           </table>
+          <button id="btn-add" class="btn-adicionar" type="button">+ Adicionar processo</button>
           <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
           <div class="acoes">
-            <button id="btn-add" class="btn btn-tracejado" type="button">+ Adicionar processo</button>
-            <button id="btn-exemplo" class="btn" type="button">Exemplo do enunciado</button>
+            <button id="btn-exemplo" class="btn" type="button">Entrada dada no trabalho</button>
             <button id="btn-arquivo" class="btn" type="button">Carregar .txt</button>
-            <button id="btn-limpar" class="btn" type="button">Limpar</button>
+            <button id="btn-limpar" class="btn btn-limpar" type="button">Limpar tudo</button>
             <input id="arquivo" type="file" accept=".txt,text/plain" hidden>
           </div>
           <p class="dica">Formato do arquivo: uma linha por processo, com <em>chegada duração prioridade</em>. Maior número = maior prioridade.</p>
@@ -115,12 +112,12 @@
           </div>
 
           <div id="aba-comparacao" class="painel" hidden>
-            <p class="dica">Mesmos processos nos 7 algoritmos. Clique em uma linha para ver o gráfico dela. Em verde, o menor valor de cada coluna.</p>
+            <p class="dica">Mesmos processos nos 7 algoritmos. Clique em uma linha para ver o gráfico dela.</p>
             <div class="rolagem"><table id="comparacao" class="tabela-comparacao"></table></div>
           </div>
         </section>
 
-        <section class="cartao">
+        <section id="cartao-resultados" class="cartao">
           <h2>Resultado por processo</h2>
           <div class="rolagem">
             <table class="tabela-resultados">

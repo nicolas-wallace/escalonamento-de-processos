@@ -338,11 +338,7 @@
     const maxTT = Math.max(...linhas.map((l) => l.r.tt_medio));
     const maxTW = Math.max(...linhas.map((l) => l.r.tw_medio), 1e-9);
     const maxTR = Math.max(...linhas.map((l) => l.r.tr_medio), 1e-9);
-    const minTT = Math.min(...linhas.map((l) => l.r.tt_medio));
-    const minTW = Math.min(...linhas.map((l) => l.r.tw_medio));
-    const minTR = Math.min(...linhas.map((l) => l.r.tr_medio));
-    const minTrocas = Math.min(...linhas.map((l) => l.r.trocas));
-    const celula = (valor, max, melhor) => el("td", {}, el("div", { class: `celula-barra${melhor ? " melhor" : ""}` },
+    const celula = (valor, max) => el("td", {}, el("div", { class: "celula-barra" },
       el("div", { class: "barra", style: `width:${Math.max(2, (valor / max) * 36)}px` }),
       el("span", { class: "num", text: fmt(valor) })));
     const corpo = linhas.map(({ a, r }) => {
@@ -351,10 +347,10 @@
         onclick: () => selecionar(a.id),
         onkeydown: (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); selecionar(a.id); } } },
         el("td", {}, el("span", { class: "nome", text: a.nome }), el("span", { class: "sub", text: sub })),
-        celula(r.tt_medio, maxTT, r.tt_medio === minTT),
-        celula(r.tw_medio, maxTW, r.tw_medio === minTW),
-        celula(r.tr_medio, maxTR, r.tr_medio === minTR),
-        el("td", { class: r.trocas === minTrocas ? "melhor" : "" }, el("span", { class: "num", text: String(r.trocas) })));
+        celula(r.tt_medio, maxTT),
+        celula(r.tw_medio, maxTW),
+        celula(r.tr_medio, maxTR),
+        el("td", {}, el("span", { class: "num", text: String(r.trocas) })));
       return tr;
     });
     $("#comparacao").replaceChildren(
@@ -372,6 +368,7 @@
   function renderAbas() {
     document.querySelectorAll(".aba").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.aba === S.aba)));
     for (const nome of ["gantt", "comparacao"]) $(`#aba-${nome}`).hidden = nome !== S.aba;
+    $("#cartao-resultados").hidden = S.aba !== "gantt";
   }
 
   function renderTudo() {
@@ -447,16 +444,6 @@
   });
 
   document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => { S.aba = b.dataset.aba; renderAbas(); }));
-
-  function aplicarTema(tema) { document.documentElement.dataset.tema = tema; }
-  try { const salvo = localStorage.getItem("tema"); if (salvo) aplicarTema(salvo); } catch { /* sem armazenamento */ }
-  $("#tema").addEventListener("click", () => {
-    const escuroNoSistema = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const atualTema = document.documentElement.dataset.tema || (escuroNoSistema ? "escuro" : "claro");
-    const novo = atualTema === "escuro" ? "claro" : "escuro";
-    aplicarTema(novo);
-    try { localStorage.setItem("tema", novo); } catch { /* sem armazenamento */ }
-  });
 
   // ---------- início ----------
 
