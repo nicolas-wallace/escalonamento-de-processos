@@ -159,4 +159,6 @@ Por exemplo, no exemplo do enunciado, P1 e P2 chegam em 0; nenhum está na CPU, 
 
 ## Autores
 
-- _[nome dos integrantes da equipe]_
+- Caio Vidal Fernandes e Silva - 555025
+- Nicolas Wallace Amorim Perote - 566512
+- Tiago Mamede Diógenes - 540764
