@@ -424,7 +424,7 @@
 
   $("#btn-add").addEventListener("click", () => {
     if (S.processos.length >= LIMITE) return;
-    S.processos.push({ chegada: "", duracao: "", prioridade: "" });
+    S.processos.push({ chegada: "0", duracao: "1", prioridade: "0" });
     renderTabela();
     atualizar();
     const novo = document.querySelector(`#tabela-processos input[data-i="${S.processos.length - 1}"]`);
