@@ -305,7 +305,7 @@
     const r = atual(), T = total(), t = S.t, caixa = $("#estado");
     if (t >= T) {
       caixa.replaceChildren(el("div", { class: "linha" },
-        el("span", { text: `Simulação completa: todos os processos terminaram em ${T} s. Use "Executar passo a passo" para ver segundo a segundo.` })));
+        el("span", { text: `Simulação completa: todos os processos terminaram em ${T} s.` })));
       return;
     }
     const naCpu = r.linha[t];
