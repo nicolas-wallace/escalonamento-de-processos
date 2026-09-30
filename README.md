@@ -1,6 +1,6 @@
 # Simulador de Escalonamento de Processos
 
-Simulador de algoritmos de escalonamento de CPU, desenvolvido para a disciplina de **Sistemas Operacionais** — Departamento de Computação, UFC.
+Simulador de algoritmos de escalonamento de CPU, desenvolvido para a disciplina de **Sistemas Operacionais**
 
 ## Objetivo
 
@@ -18,7 +18,7 @@ Simular o escalonamento de um conjunto de processos usando os algoritmos clássi
 
 ## Como executar
 
-**Passando o arquivo como argumento (recomendado, funciona em qualquer terminal):**
+**Passando o arquivo como argumento:**
 ```bash
 python main.py entrada.txt
 ```
@@ -32,12 +32,6 @@ python main.py < entrada.txt
 ```powershell
 Get-Content entrada.txt | python main.py
 ```
-
-**Digitando a entrada manualmente:**
-```bash
-python main.py
-```
-Digite as linhas dos processos e finalize com `Ctrl+D` (Linux/macOS) ou `Ctrl+Z` + Enter (Windows).
 
 ## Formato de entrada
 
@@ -112,7 +106,7 @@ aging:1
 
 **RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba (não há preempção por prioridade). Vence a maior prioridade dinâmica (maior número = maior prioridade) entre os outros processos: quem acabou de usar o quantum não repete o quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento só ocorre quando o processo anterior usou o quantum inteiro: se ele terminou antes, ninguém envelhece.
 
-Convenções adotadas (o enunciado não define):
+Convenções adotadas:
 - Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na fila antes.
 - Chegadas simultâneas entram na fila pela ordem da entrada.
 - Empate de prioridade dinâmica: vence quem está há mais tempo na fila.
