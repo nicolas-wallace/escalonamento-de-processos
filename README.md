@@ -4,7 +4,7 @@ Simulador de algoritmos de escalonamento de CPU, desenvolvido para a disciplina 
 
 ## Objetivo
 
-Simular o escalonamento de um conjunto de processos usando os algoritmos clássicos de escalonamento de processador, exibindo métricas de desempenho (tempo médio de vida, tempo médio de espera, número de trocas de contexto) e o diagrama de execução ao longo do tempo.
+Simular o escalonamento de um conjunto de processos usando os algoritmos clássicos de escalonamento de processador, exibindo métricas de desempenho (tempo médio de vida, de espera e de resposta, número de trocas de contexto) e o diagrama de execução ao longo do tempo.
 
 ## Algoritmos implementados
 
@@ -63,9 +63,10 @@ Nos algoritmos por prioridade, valores maiores indicam prioridade maior. Sem pre
 
 Para cada algoritmo, o programa imprime:
 
-- Tabela com chegada, duração, início, término, turnaround (TT) e tempo de espera (TW) de cada processo;
+- Tabela com chegada, duração, início, término, turnaround (TT), tempo de espera (TW) e tempo de resposta (TR) de cada processo;
 - Tempo médio de vida (turnaround médio);
 - Tempo médio de espera;
+- Tempo médio de resposta (primeira execução − chegada);
 - Número de trocas de contexto;
 - Diagrama de tempo de execução, na vertical (uma linha por segundo).
 
@@ -76,7 +77,7 @@ No diagrama:
 
 ## Interface gráfica (web)
 
-Além da saída no terminal, há uma interface no navegador. Ela usa o mesmo simulador (`simulacao.py`); só a apresentação é nova.
+Além da saída no terminal, há uma interface no navegador. Ela usa o mesmo simulador (`escalonador/simulacao.py`); só a apresentação é nova.
 
 ```bash
 python interface.py
@@ -89,8 +90,6 @@ Na página é possível:
 - escolher o algoritmo e ajustar quantum e aging (valores iniciais vêm do `config.txt`);
 - ver turnaround médio, espera média, resposta média, trocas de contexto e tempo total;
 - ver o gráfico de execução (com modo passo a passo) e a comparação dos 7 algoritmos.
-
-A resposta média (primeira execução − chegada) aparece só na interface.
 
 ## Regra de desempate
 
@@ -126,20 +125,21 @@ Uma troca de contexto é contabilizada sempre que a CPU passa a executar um proc
 
 ```
 .
-├── main.py              # Ponto de entrada (terminal)
-├── interface.py         # Servidor da interface web (opcional)
-├── entrada.py           # Leitura dos processos e do config.txt
-├── processo.py          # Classe Processo
-├── escalonadores.py     # Função de escolha de cada algoritmo
-├── simulacao.py         # Motor da simulação
-├── relatorio.py         # Saída no terminal (tabela + diagrama)
-├── config.txt           # Quantum e aging
-├── entrada.txt          # Exemplo de entrada
-├── web/                 # Página da interface (index.html, style.css, app.js)
-└── test_*.py            # Testes (prioridade, round-robin, interface)
+├── main.py                # Ponto de entrada (terminal)
+├── interface.py           # Servidor da interface web (opcional)
+├── config.txt             # Quantum e aging
+├── entrada.txt            # Exemplo de entrada
+├── escalonador/           # Núcleo da simulação
+│   ├── entrada.py         # Leitura dos processos e do config.txt
+│   ├── processo.py        # Classe Processo
+│   ├── escalonadores.py   # Função de escolha de cada algoritmo
+│   ├── simulacao.py       # Motor da simulação
+│   └── relatorio.py       # Saída no terminal (tabela + diagrama)
+├── web/                   # Página da interface (index.html, style.css, app.js)
+└── tests/                 # Um arquivo de teste por algoritmo, mais entrada, processo e interface
 ```
 
-### `processo.py`
+### `escalonador/processo.py`
 Define a classe `Processo`, com os atributos de controle de cada processo:
 
 | Atributo     | Descrição                                              |
@@ -152,24 +152,26 @@ Define a classe `Processo`, com os atributos de controle de cada processo:
 | `inicio`     | Instante em que o processo ocupou a CPU pela primeira vez|
 | `termino`    | Instante em que o processo terminou                       |
 
-Também expõe as propriedades `turnaround` (tempo de vida) e `espera` (tempo de espera), calculadas a partir de `termino`, `chegada` e `duracao`.
+Também expõe as propriedades `turnaround` (término − chegada), `espera` (turnaround − duração) e `resposta` (início − chegada).
 
-### `escalonadores.py`
+### `escalonador/escalonadores.py`
 Contém uma função de escolha para cada algoritmo, todas seguindo a mesma assinatura: recebem a lista de processos já chegados (candidatos) e o pid do processo em execução, e devolvem o processo escolhido para ocupar a CPU.
 
 O dicionário `ALGORITMOS` mapeia o nome do algoritmo para `(função_de_escolha, é_preemptivo)`, o que permite adicionar novos algoritmos sem alterar o motor de simulação.
 
-### `simulacao.py`
+### `escalonador/simulacao.py`
 Executa a simulação segundo a segundo: a cada instante, identifica os processos já chegados e com tempo restante, aplica a função de escolha do algoritmo, executa o processo escolhido por 1 segundo e atualiza seu estado. Ao final, conta o número de trocas de contexto.
 
-### `relatorio.py`
-Imprime a tabela de métricas por processo (chegada, duração, início, término, TT, TW), as médias de turnaround e espera, o número de trocas de contexto e o diagrama de tempo vertical.
+### `escalonador/relatorio.py`
+Imprime a tabela de métricas por processo (chegada, duração, início, término, TT, TW, TR), as médias de turnaround, espera e resposta, o número de trocas de contexto e o diagrama de tempo vertical.
 
 ## Testes
 
 ```bash
 python -m unittest
 ```
+
+Um algoritmo específico: `python -m unittest tests.test_round_robin`.
 
 ## Requisitos
 

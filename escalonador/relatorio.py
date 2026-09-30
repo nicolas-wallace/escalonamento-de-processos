@@ -1,26 +1,24 @@
-"""Formatação da saída: tabela de métricas e diagrama de tempo."""
-
-
 def imprimir_resultado(algoritmo, processos, linha_do_tempo, trocas):
-    """Tabela por processo, médias, trocas de contexto e diagrama."""
     n = len(processos)
     tts = [p.turnaround for p in processos]
     tws = [p.espera for p in processos]
+    trs = [p.resposta for p in processos]
 
     print(f"\n===== Algoritmo: {algoritmo.upper()} =====")
-    print(f"{'Processo':10}{'Chegada':10}{'Duração':10}{'Início':10}{'Término':10}{'TT':6}{'TW':6}")
-    for p, tt, tw in zip(processos, tts, tws):
-        print(f"{p.pid:10}{p.chegada:<10}{p.duracao:<10}{p.inicio:<10}{p.termino:<10}{tt:<6}{tw:<6}")
+    print(f"{'Processo':10}{'Chegada':10}{'Duração':10}{'Início':10}{'Término':10}{'TT':6}{'TW':6}{'TR':6}")
+    for p, tt, tw, tr in zip(processos, tts, tws, trs):
+        print(f"{p.pid:10}{p.chegada:<10}{p.duracao:<10}{p.inicio:<10}{p.termino:<10}{tt:<6}{tw:<6}{tr:<6}")
 
-    print(f"\nTempo médio de vida (turnaround): {sum(tts) / n:.2f}")
+    print(f"\nTempo médio de vida (turnaround):  {sum(tts) / n:.2f}")
     print(f"Tempo médio de espera (waiting):   {sum(tws) / n:.2f}")
+    print(f"Tempo médio de resposta:           {sum(trs) / n:.2f}")
     print(f"Número de trocas de contexto:      {trocas}")
 
     imprimir_diagrama(processos, linha_do_tempo)
 
 
 def imprimir_diagrama(processos, linha_do_tempo):
-    """Uma linha por segundo: ## executando, -- esperando, vazio = fora do sistema."""
+    # ## executando, -- esperando na fila, vazio = ainda não chegou ou já terminou
     pids = [p.pid for p in processos]
     cabecalho = f"{'tempo':8}" + "".join(f"{pid:5}" for pid in pids)
     print("\n" + cabecalho)

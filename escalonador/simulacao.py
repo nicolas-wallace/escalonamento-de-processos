@@ -1,16 +1,10 @@
-"""Motor da simulação: roda um algoritmo segundo a segundo sobre os processos."""
-
 import copy
 
-from escalonadores import ALGORITMOS, COM_QUANTUM
+from .escalonadores import ALGORITMOS, COM_QUANTUM
 
 
 def simular(processos_originais, algoritmo, quantum=2, aging=1):
-    """Devolve (processos finalizados, linha do tempo, trocas de contexto).
-
-    A linha do tempo tem um pid por segundo (None = CPU ociosa). A lista
-    original não é alterada.
-    """
+    # devolve (processos, linha do tempo com um pid por segundo, trocas de contexto)
     processos = copy.deepcopy(processos_originais)
     n = len(processos)
     escolher, preemptivo = ALGORITMOS[algoritmo]

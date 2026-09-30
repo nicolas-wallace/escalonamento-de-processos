@@ -1,15 +1,13 @@
-"""Interface web local: serve a pasta web/ e expõe uma API sobre o simulador."""
-
 import argparse
 import json
 import os
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from entrada import ler_configuracao
-from escalonadores import ALGORITMOS
-from processo import Processo
-from simulacao import simular
+from escalonador.entrada import ler_configuracao
+from escalonador.escalonadores import ALGORITMOS
+from escalonador.processo import Processo
+from escalonador.simulacao import simular
 
 PASTA = os.path.dirname(os.path.abspath(__file__))
 PASTA_WEB = os.path.join(PASTA, "web")
@@ -56,7 +54,7 @@ def montar_processos(lista):
 
 
 def calcular(dados):
-    """Roda os 7 algoritmos e devolve o que a página precisa desenhar."""
+    # roda os 7 algoritmos e devolve o que a página precisa desenhar
     processos = montar_processos(dados.get("processos"))
     quantum = inteiro(dados.get("quantum"), "quantum", 1, 100)
     aging = inteiro(dados.get("aging"), "aging", 0, 100)
@@ -70,12 +68,12 @@ def calcular(dados):
             "trocas": trocas,
             "tt_medio": sum(p.turnaround for p in simulados) / n,
             "tw_medio": sum(p.espera for p in simulados) / n,
-            "tr_medio": sum(p.inicio - p.chegada for p in simulados) / n,
+            "tr_medio": sum(p.resposta for p in simulados) / n,
             "processos": [
                 {"pid": p.pid, "chegada": p.chegada, "duracao": p.duracao,
                  "prioridade": p.prioridade, "inicio": p.inicio, "termino": p.termino,
                  "turnaround": p.turnaround, "espera": p.espera,
-                 "resposta": p.inicio - p.chegada}
+                 "resposta": p.resposta}
                 for p in simulados
             ],
         }

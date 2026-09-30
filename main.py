@@ -1,16 +1,14 @@
-"""Ponto de entrada do simulador."""
-
 import os
 import sys
 
-from entrada import ler_configuracao, ler_processos
-from escalonadores import ALGORITMOS
-from relatorio import imprimir_resultado
-from simulacao import simular
+from escalonador.entrada import ler_configuracao, ler_processos
+from escalonador.escalonadores import ALGORITMOS
+from escalonador.relatorio import imprimir_resultado
+from escalonador.simulacao import simular
 
 
 def obter_linhas():
-    """Lê do arquivo passado como argumento ou, sem argumento, da entrada padrão."""
+    # arquivo passado como argumento ou, sem argumento, entrada padrão
     if len(sys.argv) > 1:
         caminho = sys.argv[1]
         with open(caminho, encoding="utf-8") as arquivo:
