@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulador de Escalonamento</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="pagina">
+    <header class="topo">
+      <h1>Simulador de Escalonamento</h1>
+    </header>
+
+    <main class="grade">
+      <aside class="coluna-esq">
+        <section class="cartao">
+          <h2>Processos</h2>
+          <table class="tabela-entrada">
+            <thead>
+              <tr><th>Nome</th><th>Chegada</th><th>Duração</th><th>Prioridade</th><th></th></tr>
+            </thead>
+            <tbody id="tabela-processos"></tbody>
+          </table>
+          <button id="btn-add" class="btn-adicionar" type="button">+ Adicionar processo</button>
+          <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+          <div class="acoes-entrada">
+            <button id="btn-arquivo" class="btn" type="button">Carregar .txt</button>
+            <button id="btn-exemplo" class="btn" type="button">Entrada dada no trabalho</button>
+            <button id="btn-limpar" class="btn btn-limpar" type="button">Limpar tudo</button>
+            <input id="arquivo" type="file" accept=".txt,text/plain" hidden>
+          </div>
+        </section>
+
+        <section class="cartao">
+          <h2>Algoritmo</h2>
+          <div id="algoritmos" class="chips" role="group" aria-label="Algoritmo de escalonamento"></div>
+          <div class="parametros">
+            <label class="campo" id="campo-quantum">
+              <span>Quantum</span>
+              <input id="quantum" type="number" min="1" max="100" step="1" inputmode="numeric">
+              <small>segundos por fatia</small>
+            </label>
+            <label class="campo" id="campo-aging">
+              <span>Aging</span>
+              <input id="aging" type="number" min="0" max="100" step="1" inputmode="numeric">
+              <small>ganho por quantum</small>
+            </label>
+          </div>
+        </section>
+      </aside>
+
+      <section class="coluna-dir">
+        <div class="metricas">
+          <div class="metrica" title="Turnaround: término − chegada">
+            <span class="rotulo">Turnaround médio</span>
+            <span id="m-tt" class="valor">–</span>
+          </div>
+          <div class="metrica" title="Espera: turnaround − duração">
+            <span class="rotulo">Espera média</span>
+            <span id="m-tw" class="valor">–</span>
+          </div>
+          <div class="metrica" title="Resposta: primeira execução − chegada">
+            <span class="rotulo">Resposta média</span>
+            <span id="m-tr" class="valor">–</span>
+          </div>
+          <div class="metrica" title="Vezes em que a CPU passou a executar outro processo">
+            <span class="rotulo">Trocas de contexto</span>
+            <span id="m-trocas" class="valor">–</span>
+          </div>
+          <div class="metrica" title="Tempo até o último processo terminar">
+            <span class="rotulo">Tempo total</span>
+            <span id="m-total" class="valor">–</span>
+          </div>
+        </div>
+
+        <section class="cartao">
+          <div class="abas" role="tablist" aria-label="Visualizações">
+            <button class="aba" role="tab" data-aba="gantt" aria-selected="true" type="button">Gráfico</button>
+            <button class="aba" role="tab" data-aba="comparacao" aria-selected="false" type="button">Comparar algoritmos</button>
+          </div>
+
+          <div id="aba-gantt" class="painel">
+            <div class="legenda">
+              <span><i class="leg leg-exec"></i>executando</span>
+              <span><i class="leg leg-espera"></i>esperando na fila</span>
+            </div>
+            <div id="gantt" class="gantt"></div>
+            <div class="controles">
+              <button id="btn-reiniciar" class="btn-icone" type="button" title="Voltar ao início" aria-label="Voltar ao início">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+              </button>
+              <button id="btn-voltar" class="btn-icone" type="button" title="Um segundo para trás" aria-label="Um segundo para trás">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M15 5v14L6 12z"/></svg>
+              </button>
+              <button id="btn-play" class="btn-play" type="button">Executar passo a passo</button>
+              <button id="btn-avancar" class="btn-icone" type="button" title="Um segundo para frente" aria-label="Um segundo para frente">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 5v14l9-7z"/></svg>
+              </button>
+              <input id="slider" class="slider" type="range" min="0" max="0" value="0" aria-label="Instante da simulação">
+              <label class="velocidade">Velocidade
+                <select id="velocidade">
+                  <option value="0.5">0,5×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="2">2×</option>
+                  <option value="4">4×</option>
+                </select>
+              </label>
+            </div>
+            <div id="estado" class="estado" aria-live="polite"></div>
+          </div>
+
+          <div id="aba-comparacao" class="painel" hidden>
+            <p class="dica">Mesmos processos nos 7 algoritmos.</p>
+            <div class="rolagem"><table id="comparacao" class="tabela-comparacao"></table></div>
+          </div>
+        </section>
+
+        <section id="cartao-resultados" class="cartao">
+          <h2>Resultado por processo</h2>
+          <div class="rolagem">
+            <table class="tabela-resultados">
+              <thead>
+                <tr><th>Processo</th><th>Chegada</th><th>Duração</th><th>Prioridade</th><th>Início</th><th>Término</th><th>Turnaround</th><th>Espera</th><th>Resposta</th></tr>
+              </thead>
+              <tbody id="resultados"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

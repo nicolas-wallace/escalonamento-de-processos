@@ -1,6 +1,3 @@
-"""Modela um processo e seus atributos de controle."""
-
-
 class Processo:
     def __init__(self, pid, chegada, duracao, prioridade):
         self.pid = pid
@@ -21,3 +18,7 @@ class Processo:
     def espera(self):
         tt = self.turnaround
         return None if tt is None else tt - self.duracao
+
+    @property
+    def resposta(self):
+        return None if self.inicio is None else self.inicio - self.chegada

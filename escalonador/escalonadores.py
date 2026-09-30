@@ -1,21 +1,12 @@
-"""Funções de escolha de processo para cada algoritmo de escalonamento.
-
-Cada função recebe a lista de candidatos (processos já chegados e com
-tempo restante > 0) e o pid do processo atualmente em execução, e
-devolve o processo escolhido para ocupar a CPU.
-
-Critério de desempate comum aos algoritmos, conforme o enunciado:
-  (i)   processo que já está com o processador (evita troca de contexto)
-  (ii)  menor tempo restante de processamento
-  (iii) escolha arbitrária (usamos o pid, por reprodutibilidade)
-"""
+# cada função recebe os candidatos (já chegados, com tempo restante) e o pid em execução
 
 
 def _com_desempate(candidatos, executando_pid, chave_primaria):
+    # desempate: quem já está na CPU, menor tempo restante, pid
     def chave(p):
         ja_rodando = 0 if p.pid == executando_pid else 1
         return (chave_primaria(p), ja_rodando, p.restante, p.pid)
-    return sorted(candidatos, key=chave)[0]
+    return min(candidatos, key=chave)
 
 
 def escolher_fcfs(candidatos, executando_pid):
@@ -34,13 +25,13 @@ def escolher_prioridade(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: -p.prioridade)
 
 
-# round robin: vence quem está há mais tempo na fila
 def escolher_rr(candidatos, executando_pid, quantum_completo, aging):
+    # vence quem está há mais tempo na fila
     return min(candidatos, key=lambda p: p.fila)
 
 
-# round robin com envelhecimento: maior prioridade dinâmica, sem repetir quem acabou de executar
 def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
+    # maior prioridade dinâmica, sem repetir quem acabou de executar
     outros = [p for p in candidatos if p.pid != executando_pid]
     escolhido = min(outros, key=lambda p: (-p.prioridade_dinamica, p.fila))
     # quem esperou ganha +aging, só se o quantum foi completo
@@ -53,16 +44,16 @@ def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
     return escolhido
 
 
-# algoritmo -> (função de escolha, é_preemptivo?)
+# algoritmo -> (função de escolha, é preemptivo?)
 ALGORITMOS = {
-    "fcfs": (escolher_fcfs, False),
-    "sjf": (escolher_sjf, False),
-    "srtf": (escolher_srtf, True),
-    "prioridade_sem_preempcao": (escolher_prioridade, False),
-    "prioridade_com_preempcao": (escolher_prioridade, True),
-    "round_robin": (escolher_rr, True),
-    "round_robin_prioridade_aging": (escolher_rr_aging, True),
+    "FCFS": (escolher_fcfs, False),
+    "SJF": (escolher_sjf, False),
+    "SRTF": (escolher_srtf, True),
+    "PRIOc": (escolher_prioridade, False),
+    "PRIOp": (escolher_prioridade, True),
+    "RR": (escolher_rr, True),
+    "RR (aging)": (escolher_rr_aging, True),
 }
 
-# algoritmos que trocam de processo por fim de quantum
-COM_QUANTUM = ("round_robin", "round_robin_prioridade_aging")
+# algoritmos em que o quantum define a troca de processo
+COM_QUANTUM = ("RR", "RR (aging)")
