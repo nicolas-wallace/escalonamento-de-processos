@@ -97,7 +97,7 @@ Em caso de empate na escolha do processo a ocupar a CPU, é aplicada a seguinte 
 
 1. Processo que já está com o processador (evita troca de contexto desnecessária);
 2. Processo com menor tempo restante de execução;
-3. Escolha determinística pelo `pid` (usado como substituto de uma escolha aleatória, garantindo reprodutibilidade dos testes).
+3. Escolha determinística pelo `pid` (usado como substituto de uma escolha aleatória, garantindo resultados reproduzíveis).
 
 ## RR e RR (aging)
 
@@ -135,8 +135,7 @@ Uma troca de contexto é contabilizada sempre que a CPU passa a executar um proc
 │   ├── escalonadores.py   # Função de escolha de cada algoritmo
 │   ├── simulacao.py       # Motor da simulação
 │   └── relatorio.py       # Saída no terminal (tabela + diagrama)
-├── web/                   # Página da interface (index.html, style.css, app.js)
-└── tests/                 # Um arquivo de teste por algoritmo, mais entrada, processo e interface
+└── web/                   # Página da interface (index.html, style.css, app.js)
 ```
 
 ### `escalonador/processo.py`
@@ -164,14 +163,6 @@ Executa a simulação segundo a segundo: a cada instante, identifica os processo
 
 ### `escalonador/relatorio.py`
 Imprime a tabela de métricas por processo (chegada, duração, início, término, TT, TW, TR), as médias de turnaround, espera e resposta, o número de trocas de contexto e o diagrama de tempo vertical.
-
-## Testes
-
-```bash
-python -m unittest
-```
-
-Um algoritmo específico: `python -m unittest tests.test_rr`.
 
 ## Requisitos
 
