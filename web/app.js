@@ -31,6 +31,7 @@
 
   const $ = (sel) => document.querySelector(sel);
 
+  // cria um elemento HTML com atributos e filhos
   function el(tag, props = {}, ...filhos) {
     const e = document.createElement(tag);
     for (const [k, v] of Object.entries(props)) {
@@ -43,6 +44,7 @@
     return e;
   }
 
+  // cria um elemento SVG (usado no gráfico)
   function sv(tag, props = {}, ...filhos) {
     const e = document.createElementNS(NS, tag);
     for (const [k, v] of Object.entries(props)) e.setAttribute(k, v);
@@ -59,16 +61,19 @@
 
   // ---------- entrada ----------
 
+  // converte o texto em inteiro (null se não for um inteiro válido)
   function inteiro(txt) {
     const s = String(txt).trim();
     return /^-?\d+$/.test(s) ? parseInt(s, 10) : null;
   }
 
+  // pinta o campo de vermelho quando o valor é inválido
   function marcar(seletor, ruim) {
     const campo = document.querySelector(seletor);
     if (campo) campo.classList.toggle("invalido", ruim);
   }
 
+  // confere os campos e monta os dados enviados ao servidor
   function validar() {
     if (!S.processos.length) return { erro: "Adicione pelo menos um processo." };
     const dados = { processos: [] };
@@ -98,8 +103,10 @@
     return { erro, dados };
   }
 
+  // mostra a mensagem de erro sob a tabela de processos
   function mostrarAviso(texto) { $("#aviso").textContent = texto; }
 
+  // desenha a tabela de processos editável
   function renderTabela() {
     const corpo = $("#tabela-processos");
     corpo.replaceChildren(...S.processos.map((p, i) => {
@@ -121,12 +128,14 @@
     }));
   }
 
+  // substitui os processos da tabela e recalcula
   function carregar(lista) {
     S.processos = lista.map(([c, d, p]) => ({ chegada: String(c), duracao: String(d), prioridade: String(p) }));
     renderTabela();
     atualizar();
   }
 
+  // lê um .txt (chegada duração prioridade por linha) e carrega na tabela
   async function lerArquivo(arquivo) {
     const linhas = (await arquivo.text()).split(/\r?\n/).filter((l) => l.trim());
     const novos = [];
@@ -144,6 +153,7 @@
 
   // ---------- comunicação com o simulador ----------
 
+  // valida, pede ao servidor a simulação dos 7 algoritmos e redesenha
   async function atualizar() {
     const v = validar();
     mostrarAviso(v.erro);
@@ -168,6 +178,7 @@
 
   // ---------- desenho ----------
 
+  // desenha os botões de algoritmo e habilita quantum/aging quando fazem sentido
   function renderAlgoritmos() {
     $("#algoritmos").replaceChildren(...ALGORITMOS.map((a) => el("button", {
       class: "chip", type: "button", "aria-pressed": String(a.nome === S.algoritmo),
@@ -179,12 +190,14 @@
     $("#campo-aging").classList.toggle("inativo", !usa.includes("aging"));
   }
 
+  // troca o algoritmo exibido
   function selecionar(nome) {
     S.algoritmo = nome;
     parar();
     if (S.resultados) { S.t = total(); renderTudo(); } else renderAlgoritmos();
   }
 
+  // mostra as médias do algoritmo selecionado
   function renderMetricas() {
     const r = atual();
     $("#m-tt").textContent = fmt(r.tt_medio);
@@ -194,6 +207,7 @@
     $("#m-total").textContent = `${total()} s`;
   }
 
+  // agrupa os segundos consecutivos de um processo em trechos contínuos
   function trechos(linha, valor) {
     const lista = [];
     linha.forEach((x, i) => {
@@ -204,6 +218,7 @@
     return lista;
   }
 
+  // desenha o gráfico de execução até o instante atual da animação
   function renderGantt() {
     const r = atual(), T = total(), t = S.t, n = r.processos.length;
     const unit = Math.max(24, Math.min(54, Math.floor(700 / T)));
@@ -269,6 +284,7 @@
     $("#gantt").replaceChildren(g);
   }
 
+  // etiqueta colorida de um processo
   function pilula(pid, detalhe) {
     const i = indiceDe(pid), c = cor(i);
     const p = el("span", { class: "pilula", style: `background:${c}` }, pid);
@@ -276,11 +292,13 @@
     return p;
   }
 
+  // uma linha do painel de estado (título + processos)
   function linhaEstado(titulo, itens) {
     return el("div", { class: "linha" }, el("span", { class: "titulo", text: titulo }),
       ...(itens.length ? itens : [el("span", { class: "vazio", text: "ninguém" })]));
   }
 
+  // mostra quem está na CPU, quem espera e quem ainda não chegou no instante atual
   function renderEstado() {
     const r = atual(), T = total(), t = S.t, caixa = $("#estado");
     if (t >= T) {
@@ -303,6 +321,7 @@
       linhaEstado("Ainda não chegaram", futuros.map((p) => pilula(p.pid, `chega em ${p.chegada}`))));
   }
 
+  // atualiza botões e barra de tempo da animação
   function renderControles() {
     const T = total();
     $("#slider").max = String(T);
@@ -313,6 +332,7 @@
     $("#btn-avancar").disabled = S.t >= T;
   }
 
+  // tabela com as médias dos 7 algoritmos
   function renderComparacao() {
     const linhas = ALGORITMOS.map((a) => ({ a, r: S.resultados[a.nome] }));
     const maxTT = Math.max(...linhas.map((l) => l.r.tt_medio));
@@ -337,18 +357,21 @@
       el("tbody", {}, ...corpo));
   }
 
+  // tabela de resultados por processo
   function renderResultados() {
     $("#resultados").replaceChildren(...atual().processos.map((p, i) => el("tr", {},
       el("td", {}, el("span", { class: "amostra", style: `background:${cor(i)}` }), p.pid),
       ...[p.chegada, p.duracao, p.prioridade, p.inicio, p.termino, p.turnaround, p.espera, p.resposta].map((v) => el("td", { text: String(v) })))));
   }
 
+  // mostra a aba escolhida
   function renderAbas() {
     document.querySelectorAll(".aba").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.aba === S.aba)));
     for (const nome of ["gantt", "comparacao"]) $(`#aba-${nome}`).hidden = nome !== S.aba;
     $("#cartao-resultados").hidden = S.aba !== "gantt";
   }
 
+  // redesenha toda a página
   function renderTudo() {
     renderAlgoritmos();
     renderMetricas();
@@ -360,6 +383,7 @@
     renderAbas();
   }
 
+  // redesenha só o que muda durante a animação
   function renderAnimacao() {
     renderGantt();
     renderEstado();
@@ -368,17 +392,20 @@
 
   // ---------- animação ----------
 
+  // interrompe a animação
   function parar() {
     clearInterval(S.timer);
     S.timer = null;
     S.tocando = false;
   }
 
+  // avança ou volta a animação em segundos
   function passo(delta) {
     S.t = Math.max(0, Math.min(total(), S.t + delta));
     renderAnimacao();
   }
 
+  // inicia ou pausa a animação passo a passo (1 segundo por passo)
   function alternarPlay() {
     if (S.tocando) { parar(); renderControles(); return; }
     if (S.t >= total()) S.t = 0;
@@ -426,6 +453,7 @@
 
   // ---------- início ----------
 
+  // carrega quantum/aging do servidor e abre com o exemplo do enunciado
   async function iniciar() {
     const config = await (await fetch("/api/config")).json();
     S.quantum = String(config.quantum);

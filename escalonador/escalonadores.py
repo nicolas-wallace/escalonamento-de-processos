@@ -9,27 +9,33 @@ def _com_desempate(candidatos, executando_pid, chave_primaria):
     return min(candidatos, key=chave)
 
 
+# FCFS: menor instante de chegada
 def escolher_fcfs(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: p.chegada)
 
 
+# SJF: menor tempo restante (sem preempção: o motor só escolhe quando a CPU fica livre)
 def escolher_sjf(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: p.restante)
 
 
+# SRTF: menor tempo restante, reavaliado a cada segundo (preemptivo)
 def escolher_srtf(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: p.restante)
 
 
+# PRIOc e PRIOp: maior prioridade (PRIOp reavalia a cada segundo, PRIOc só ao liberar a CPU)
 def escolher_prioridade(candidatos, executando_pid):
     return _com_desempate(candidatos, executando_pid, lambda p: -p.prioridade)
 
 
+# RR: fila FIFO; p.fila = (instante em que entrou na fila, 0 = chegada / 1 = perdeu a CPU)
 def escolher_rr(candidatos, executando_pid, quantum_completo, aging):
-    # vence quem entrou antes na fila; empate: menor tempo restante, pid
-    return min(candidatos, key=lambda p: (p.fila, p.restante, p.pid))
+    # vence quem entrou antes na fila (chegadas simultâneas: ordem da entrada)
+    return min(candidatos, key=lambda p: p.fila)
 
 
+# RR (aging): prioridade dinâmica sobe +aging por quantum de espera
 def escolher_rr_aging(candidatos, executando_pid, quantum_completo, aging):
     # maior prioridade dinâmica, sem repetir quem acabou de executar;
     # empate: menor tempo restante, pid

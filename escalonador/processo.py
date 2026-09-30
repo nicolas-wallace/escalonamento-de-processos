@@ -1,9 +1,10 @@
 class Processo:
     def __init__(self, pid, chegada, duracao, prioridade):
-        self.pid = pid
-        self.chegada = chegada
-        self.duracao = duracao
-        self.prioridade = prioridade
+        self.pid = pid                # identificador (P1, P2, ...)
+        self.chegada = chegada        # instante de criação
+        self.duracao = duracao        # tempo total de CPU necessário
+        self.prioridade = prioridade  # prioridade estática (maior número = maior prioridade)
+        self.status = "novo"         # novo, pronto, executando ou terminado
         self.restante = duracao      # tempo restante de execução
         self.inicio = None           # primeira vez que ocupou a CPU
         self.termino = None          # instante em que terminou
