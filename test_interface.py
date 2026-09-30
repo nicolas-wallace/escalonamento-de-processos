@@ -29,6 +29,7 @@ class CalcularTests(unittest.TestCase):
         self.assertEqual(rr["tt_medio"], 9.75)
         self.assertEqual(rr["tw_medio"], 6.25)
         self.assertEqual(rr["trocas"], 7)
+        self.assertEqual(rr["tr_medio"], 2.5)
 
     def test_entradas_invalidas(self):
         invalidas = [

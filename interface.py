@@ -71,10 +71,12 @@ def calcular(dados):
             "trocas": trocas,
             "tt_medio": sum(p.turnaround for p in simulados) / n,
             "tw_medio": sum(p.espera for p in simulados) / n,
+            "tr_medio": sum(p.inicio - p.chegada for p in simulados) / n,
             "processos": [
                 {"pid": p.pid, "chegada": p.chegada, "duracao": p.duracao,
                  "prioridade": p.prioridade, "inicio": p.inicio, "termino": p.termino,
-                 "turnaround": p.turnaround, "espera": p.espera}
+                 "turnaround": p.turnaround, "espera": p.espera,
+                 "resposta": p.inicio - p.chegada}
                 for p in simulados
             ],
         }

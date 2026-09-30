@@ -143,8 +143,8 @@ Abre `http://127.0.0.1:8000/` (opções: `--porta N`, `--sem-navegador`). Só a 
 Na página é possível:
 - editar os processos (chegada, duração, prioridade) ou carregar um `.txt` no mesmo formato do `entrada.txt`;
 - escolher o algoritmo e ajustar quantum e aging (valores iniciais vêm do `config.txt`);
-- ver turnaround médio, espera média, trocas de contexto e tempo total;
-- ver o gráfico de Gantt, com execução passo a passo, o diagrama vertical (copiável como texto) e uma comparação dos 7 algoritmos.
+- ver turnaround médio, espera média, resposta média, trocas de contexto e tempo total;
+- ver o gráfico de execução, com execução passo a passo, e uma comparação dos 7 algoritmos.
 
 Arquivos: `interface.py` (servidor e API) e a pasta `web/` (`index.html`, `style.css`, `app.js`).
 

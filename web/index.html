@@ -9,10 +9,7 @@
 <body>
   <div class="pagina">
     <header class="topo">
-      <div>
-        <h1>Simulador de Escalonamento</h1>
-        <p class="subtitulo">Sistemas Operacionais · escalonamento de CPU</p>
-      </div>
+      <h1>Simulador de Escalonamento</h1>
       <button id="tema" class="btn-icone" type="button" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       </button>
@@ -42,10 +39,6 @@
         <section class="cartao">
           <h2>Algoritmo</h2>
           <div id="algoritmos" class="chips" role="group" aria-label="Algoritmo de escalonamento"></div>
-          <div class="descricao">
-            <span id="tipo" class="selo"></span>
-            <p id="descricao"></p>
-          </div>
           <div class="parametros">
             <label class="campo" id="campo-quantum">
               <span>Quantum</span>
@@ -71,6 +64,10 @@
             <span class="rotulo">Espera média</span>
             <span id="m-tw" class="valor">–</span>
           </div>
+          <div class="metrica" title="Resposta: primeira execução − chegada">
+            <span class="rotulo">Resposta média</span>
+            <span id="m-tr" class="valor">–</span>
+          </div>
           <div class="metrica" title="Vezes em que a CPU passou a executar outro processo">
             <span class="rotulo">Trocas de contexto</span>
             <span id="m-trocas" class="valor">–</span>
@@ -83,8 +80,7 @@
 
         <section class="cartao">
           <div class="abas" role="tablist" aria-label="Visualizações">
-            <button class="aba" role="tab" data-aba="gantt" aria-selected="true" type="button">Gráfico de Gantt</button>
-            <button class="aba" role="tab" data-aba="diagrama" aria-selected="false" type="button">Diagrama vertical</button>
+            <button class="aba" role="tab" data-aba="gantt" aria-selected="true" type="button">Gráfico</button>
             <button class="aba" role="tab" data-aba="comparacao" aria-selected="false" type="button">Comparar algoritmos</button>
           </div>
 
@@ -92,7 +88,6 @@
             <div class="legenda">
               <span><i class="leg leg-exec"></i>executando</span>
               <span><i class="leg leg-espera"></i>esperando na fila</span>
-              <span><i class="leg leg-ocioso"></i>CPU ociosa</span>
             </div>
             <div id="gantt" class="gantt"></div>
             <div class="controles">
@@ -119,15 +114,6 @@
             <div id="estado" class="estado" aria-live="polite"></div>
           </div>
 
-          <div id="aba-diagrama" class="painel" hidden>
-            <p class="dica">Mesmo formato do terminal: <b>##</b> executando, <b>--</b> esperando na fila, vazio = ainda não chegou ou já terminou.</p>
-            <div class="rolagem"><table id="diagrama" class="tabela-diagrama"></table></div>
-            <div class="acoes">
-              <button id="btn-copiar" class="btn" type="button">Copiar como texto</button>
-              <span id="aviso-copia" class="dica" role="status"></span>
-            </div>
-          </div>
-
           <div id="aba-comparacao" class="painel" hidden>
             <p class="dica">Mesmos processos nos 7 algoritmos. Clique em uma linha para ver o gráfico dela. Em verde, o menor valor de cada coluna.</p>
             <div class="rolagem"><table id="comparacao" class="tabela-comparacao"></table></div>
@@ -139,7 +125,7 @@
           <div class="rolagem">
             <table class="tabela-resultados">
               <thead>
-                <tr><th>Processo</th><th>Chegada</th><th>Duração</th><th>Prioridade</th><th>Início</th><th>Término</th><th>Turnaround</th><th>Espera</th></tr>
+                <tr><th>Processo</th><th>Chegada</th><th>Duração</th><th>Prioridade</th><th>Início</th><th>Término</th><th>Turnaround</th><th>Espera</th><th>Resposta</th></tr>
               </thead>
               <tbody id="resultados"></tbody>
             </table>
@@ -147,8 +133,6 @@
         </section>
       </section>
     </main>
-
-    <footer class="rodape">Os números vêm do mesmo simulador usado no terminal (<code>python main.py</code>).</footer>
   </div>
   <script src="/app.js"></script>
 </body>

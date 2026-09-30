@@ -2,20 +2,13 @@
   "use strict";
 
   const ALGORITMOS = [
-    { id: "fcfs", nome: "FCFS", tipo: "cooperativo",
-      desc: "Atende os processos na ordem de chegada. Quem ocupa a CPU só a libera quando termina." },
-    { id: "sjf", nome: "SJF", tipo: "cooperativo",
-      desc: "Entre os processos prontos, escolhe o de menor duração. Não interrompe quem está executando." },
-    { id: "srtf", nome: "SRTF", tipo: "preemptivo",
-      desc: "Versão preemptiva do SJF: quem chega com menos tempo restante que o atual toma a CPU." },
-    { id: "prioridade_sem_preempcao", nome: "Prioridade", tipo: "cooperativo",
-      desc: "Escolhe o processo de maior prioridade entre os prontos. Quem está executando só sai quando termina." },
-    { id: "prioridade_com_preempcao", nome: "Prioridade preemptiva", tipo: "preemptivo",
-      desc: "Quando chega um processo de prioridade maior que a do atual, ele toma a CPU na hora." },
-    { id: "round_robin", nome: "Round-Robin", tipo: "preemptivo", params: ["quantum"],
-      desc: "Cada processo executa no máximo um quantum. Se não terminar, volta para o fim da fila." },
-    { id: "round_robin_prioridade_aging", nome: "RR com envelhecimento", tipo: "preemptivo", params: ["quantum", "aging"],
-      desc: "Round-Robin em que a vez vai para a maior prioridade dinâmica. Quem espera ganha +aging a cada quantum completo, e ninguém repete o quantum seguinte se houver outro esperando. Não há preempção por prioridade." },
+    { id: "fcfs", nome: "FCFS", tipo: "cooperativo" },
+    { id: "sjf", nome: "SJF", tipo: "cooperativo" },
+    { id: "srtf", nome: "SRTF", tipo: "preemptivo" },
+    { id: "prioridade_sem_preempcao", nome: "PRIOc", tipo: "cooperativo" },
+    { id: "prioridade_com_preempcao", nome: "PRIOp", tipo: "preemptivo" },
+    { id: "round_robin", nome: "RR", tipo: "preemptivo", params: ["quantum"] },
+    { id: "round_robin_prioridade_aging", nome: "RR (aging)", tipo: "preemptivo", params: ["quantum", "aging"] },
   ];
 
   const CORES = ["#4F7CE8", "#E8A33D", "#8E6BD9", "#3FB68B", "#E0607E", "#3AA7C9",
@@ -201,8 +194,6 @@
       onclick: () => selecionar(a.id),
     }, a.nome)));
     const a = ALGORITMOS.find((x) => x.id === S.algoritmo);
-    $("#tipo").textContent = a.tipo;
-    $("#descricao").textContent = a.desc;
     const usa = a.params || [];
     $("#campo-quantum").classList.toggle("inativo", !usa.includes("quantum"));
     $("#campo-aging").classList.toggle("inativo", !usa.includes("aging"));
@@ -218,6 +209,7 @@
     const r = atual();
     $("#m-tt").textContent = fmt(r.tt_medio);
     $("#m-tw").textContent = fmt(r.tw_medio);
+    $("#m-tr").textContent = fmt(r.tr_medio);
     $("#m-trocas").textContent = String(r.trocas);
     $("#m-total").textContent = `${total()} s`;
   }
@@ -241,7 +233,7 @@
     const x = (s) => L + s * unit;
 
     const resumo = r.processos.map((p) => `${p.pid}: ${trechos(r.linha, p.pid).map((c) => `${c.ini} a ${c.fim}`).join(", ")}`).join("; ");
-    const g = sv("svg", { viewBox: `0 0 ${larg} ${alt}`, width: "100%", role: "img", "aria-label": `Gráfico de Gantt. ${resumo}` });
+    const g = sv("svg", { viewBox: `0 0 ${larg} ${alt}`, width: "100%", role: "img", "aria-label": `Gráfico. ${resumo}` });
     g.style.minWidth = `${Math.min(larg, T * 24 + L + 16)}px`;
 
     for (let s = 0; s <= T; s++) g.append(sv("line", { class: "g-grade", x1: x(s), y1: topo - 4, x2: x(s), y2: yEixo }));
@@ -323,7 +315,8 @@
     const futuros = r.processos.filter((p) => p.chegada > t);
     const prontoCpu = r.processos.find((p) => p.pid === naCpu);
     caixa.replaceChildren(
-      el("div", { class: "linha" }, el("span", { class: "titulo", text: `Instante ${t} s` }),
+      el("div", { class: "linha" }, el("span", { class: "titulo", text: `Instante ${t} s` })),
+      el("div", { class: "linha" },
         el("span", { text: naCpu ? "a CPU vai executar:" : "a CPU fica ociosa neste segundo" }),
         ...(naCpu ? [pilula(naCpu, restam(prontoCpu))] : [])),
       linhaEstado("Esperando na fila", prontos.map((p) => pilula(p.pid, restam(p)))),
@@ -340,46 +333,17 @@
     $("#btn-avancar").disabled = S.t >= T;
   }
 
-  function renderDiagrama() {
-    const r = atual();
-    const cabeca = el("tr", {}, el("th", { text: "tempo" }),
-      ...r.processos.map((p, i) => el("th", {}, el("span", { class: "amostra", style: `background:${cor(i)}` }), p.pid)));
-    const linhas = r.linha.map((pid, t) => el("tr", {},
-      el("td", { text: `${t}–${t + 1}` }),
-      ...r.processos.map((p, i) => {
-        if (pid === p.pid) {
-          const c = cor(i);
-          return el("td", {}, el("span", { class: "exec", style: `background:${c};color:${corTexto(c)}`, text: "##" }));
-        }
-        if (p.chegada <= t && t < p.termino) return el("td", { class: "fila", text: "--" });
-        return el("td");
-      })));
-    $("#diagrama").replaceChildren(el("thead", {}, cabeca), el("tbody", {}, ...linhas));
-  }
-
-  function diagramaEmTexto() {
-    const r = atual();
-    let texto = "tempo".padEnd(8) + r.processos.map((p) => p.pid.padEnd(5)).join("") + "\n";
-    r.linha.forEach((pid, t) => {
-      texto += `${String(t).padStart(3)}-${String(t + 1).padEnd(4)}`;
-      for (const p of r.processos) {
-        const simbolo = pid === p.pid ? "##" : (p.chegada <= t && t < p.termino ? "--" : "");
-        texto += simbolo.padEnd(5);
-      }
-      texto += "\n";
-    });
-    return texto;
-  }
-
   function renderComparacao() {
     const linhas = ALGORITMOS.map((a) => ({ a, r: S.resultados[a.id] }));
     const maxTT = Math.max(...linhas.map((l) => l.r.tt_medio));
     const maxTW = Math.max(...linhas.map((l) => l.r.tw_medio), 1e-9);
+    const maxTR = Math.max(...linhas.map((l) => l.r.tr_medio), 1e-9);
     const minTT = Math.min(...linhas.map((l) => l.r.tt_medio));
     const minTW = Math.min(...linhas.map((l) => l.r.tw_medio));
+    const minTR = Math.min(...linhas.map((l) => l.r.tr_medio));
     const minTrocas = Math.min(...linhas.map((l) => l.r.trocas));
     const celula = (valor, max, melhor) => el("td", {}, el("div", { class: `celula-barra${melhor ? " melhor" : ""}` },
-      el("div", { class: "barra", style: `width:${Math.max(2, (valor / max) * 90)}px` }),
+      el("div", { class: "barra", style: `width:${Math.max(2, (valor / max) * 36)}px` }),
       el("span", { class: "num", text: fmt(valor) })));
     const corpo = linhas.map(({ a, r }) => {
       const sub = a.params ? a.params.map((k) => `${k} ${S[k]}`).join(" · ") : a.tipo;
@@ -389,24 +353,25 @@
         el("td", {}, el("span", { class: "nome", text: a.nome }), el("span", { class: "sub", text: sub })),
         celula(r.tt_medio, maxTT, r.tt_medio === minTT),
         celula(r.tw_medio, maxTW, r.tw_medio === minTW),
+        celula(r.tr_medio, maxTR, r.tr_medio === minTR),
         el("td", { class: r.trocas === minTrocas ? "melhor" : "" }, el("span", { class: "num", text: String(r.trocas) })));
       return tr;
     });
     $("#comparacao").replaceChildren(
       el("thead", {}, el("tr", {}, el("th", { text: "Algoritmo" }), el("th", { text: "Turnaround médio" }),
-        el("th", { text: "Espera média" }), el("th", { text: "Trocas" }))),
+        el("th", { text: "Espera média" }), el("th", { text: "Resposta média" }), el("th", { text: "Trocas" }))),
       el("tbody", {}, ...corpo));
   }
 
   function renderResultados() {
     $("#resultados").replaceChildren(...atual().processos.map((p, i) => el("tr", {},
       el("td", {}, el("span", { class: "amostra", style: `background:${cor(i)}` }), p.pid),
-      ...[p.chegada, p.duracao, p.prioridade, p.inicio, p.termino, p.turnaround, p.espera].map((v) => el("td", { text: String(v) })))));
+      ...[p.chegada, p.duracao, p.prioridade, p.inicio, p.termino, p.turnaround, p.espera, p.resposta].map((v) => el("td", { text: String(v) })))));
   }
 
   function renderAbas() {
     document.querySelectorAll(".aba").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.aba === S.aba)));
-    for (const nome of ["gantt", "diagrama", "comparacao"]) $(`#aba-${nome}`).hidden = nome !== S.aba;
+    for (const nome of ["gantt", "comparacao"]) $(`#aba-${nome}`).hidden = nome !== S.aba;
   }
 
   function renderTudo() {
@@ -415,7 +380,6 @@
     renderGantt();
     renderEstado();
     renderControles();
-    renderDiagrama();
     renderComparacao();
     renderResultados();
     renderAbas();
@@ -483,27 +447,6 @@
   });
 
   document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => { S.aba = b.dataset.aba; renderAbas(); }));
-
-  $("#btn-copiar").addEventListener("click", async () => {
-    const aviso = $("#aviso-copia");
-    const texto = diagramaEmTexto();
-    let copiado = false;
-    try {
-      await navigator.clipboard.writeText(texto);
-      copiado = true;
-    } catch {
-      const area = document.createElement("textarea");
-      area.value = texto;
-      area.style.position = "fixed";
-      area.style.opacity = "0";
-      document.body.appendChild(area);
-      area.select();
-      try { copiado = document.execCommand("copy"); } catch { copiado = false; }
-      area.remove();
-    }
-    aviso.textContent = copiado ? "Copiado." : "Não foi possível copiar automaticamente.";
-    setTimeout(() => { aviso.textContent = ""; }, 2500);
-  });
 
   function aplicarTema(tema) { document.documentElement.dataset.tema = tema; }
   try { const salvo = localStorage.getItem("tema"); if (salvo) aplicarTema(salvo); } catch { /* sem armazenamento */ }
