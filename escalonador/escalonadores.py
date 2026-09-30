@@ -31,8 +31,8 @@ def escolher_prioridade(candidatos, executando_pid):
 
 # RR: fila FIFO; p.fila = (instante em que entrou na fila, 0 = chegada / 1 = perdeu a CPU)
 def escolher_rr(candidatos, executando_pid, quantum_completo, aging):
-    # vence quem entrou antes na fila (chegadas simultâneas: ordem da entrada)
-    return min(candidatos, key=lambda p: p.fila)
+    # vence quem entrou antes na fila; empate: menor tempo restante, pid
+    return min(candidatos, key=lambda p: (p.fila, p.restante, p.pid))
 
 
 # RR (aging): prioridade dinâmica sobe +aging por quantum de espera

@@ -144,11 +144,11 @@ Como no enunciado, quando há empate na escolha de quem ocupa a CPU, vale esta o
 2. o de menor tempo restante;
 3. escolha arbitrária: usamos o `pid`, para o resultado ser sempre o mesmo.
 
-Por exemplo, no FCFS do enunciado, P1 e P2 chegam em 0; nenhum está na CPU, então vence P2, que tem menor tempo restante.
+Por exemplo, no exemplo do enunciado, P1 e P2 chegam em 0; nenhum está na CPU, então vence P2, que tem menor tempo restante. Isso vale para todos os algoritmos, inclusive RR e RR (aging).
 
 ### RR e RR (aging)
 
-**RR:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora. A fila é por ordem de entrada: chegadas simultâneas entram pela ordem da entrada (como no diagrama do enunciado) e, se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na frente.
+**RR:** cada processo executa no máximo `quantum` segundos seguidos. Se não terminar, volta para o fim da fila. Se terminar antes do fim do quantum, o próximo assume a CPU na hora. A fila é por ordem de entrada. Se um processo chega no mesmo instante em que outro perde a CPU por fim de quantum, o que chegou entra na frente. Se dois entram no mesmo instante (por exemplo, chegadas simultâneas), vale a regra de desempate: menor tempo restante e, depois, o `pid`.
 
 **RR (aging):** a escolha só acontece quando a CPU fica livre ou o quantum acaba, e não há preempção por prioridade. Vence a maior prioridade dinâmica entre os outros processos: quem acabou de usar o quantum não repete no quantum seguinte se houver alguém esperando. Depois da escolha, quem estava esperando ganha `+aging` e o escolhido volta à prioridade estática. O envelhecimento ocorre a cada quantum completo: se o processo anterior terminou antes do fim do quantum, ninguém envelhece. Empate de prioridade dinâmica segue a regra de desempate acima.
 
